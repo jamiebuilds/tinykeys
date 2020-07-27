@@ -75,7 +75,7 @@ function match(event: KeyboardEvent, press: KeyBindingPress): boolean {
 }
 
 /**
- * Subscribes to KeyBindings.
+ * Subscribes to keybindings.
  *
  * Returns an unsubscribe method.
  *

@@ -1,6 +1,6 @@
-import keybindings from "../src/keybindings"
+import tinykeys from "../src/tinykeys"
 
-keybindings(window, {
+tinykeys(window, {
 	"Shift+D": () => {
 		alert("The 'Shift' and 'd' keys were pressed at the same time")
 	},
