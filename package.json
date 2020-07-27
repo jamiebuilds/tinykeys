@@ -1,13 +1,13 @@
 {
-  "name": "keybindings",
+  "name": "tinykeys",
   "version": "1.0.0",
   "description": "A tiny (~400 B) & modern library for keybindings.",
   "author": "Jamie Kyle <me@thejameskyle.com>",
   "license": "MIT",
-  "repository": "jamiebuilds/keybindings",
-  "source": "src/keybindings.ts",
-  "main": "dist/keybindings.js",
-  "module": "dist/keybindings.module.js",
+  "repository": "jamiebuilds/tinykeys",
+  "source": "src/tinykeys.ts",
+  "main": "dist/tinykeys.js",
+  "module": "dist/tinykeys.module.js",
   "files": [
     "dist"
   ],
