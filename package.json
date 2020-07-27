@@ -1,0 +1,88 @@
+{
+  "name": "keybindings",
+  "version": "0.0.0",
+  "description": "A tiny (~400 B) & modern library for keybindings.",
+  "author": "Jamie Kyle <me@thejameskyle.com>",
+  "license": "MIT",
+  "repository": "jamiebuilds/keybindings",
+  "source": "src/keybindings.ts",
+  "main": "dist/keybindings.js",
+  "module": "dist/keybindings.module.js",
+  "files": [
+    "dist"
+  ],
+  "keywords": [
+    "key",
+    "keys",
+    "bindings",
+    "hot",
+    "hotkeys",
+    "a11y",
+    "accessibility",
+    "keyboard",
+    "navigation",
+    "event",
+    "handler",
+    "react",
+    "vue",
+    "angular",
+    "ember",
+    "mousetrap",
+    "shortcuts"
+  ],
+  "scripts": {
+    "check": "tsc --noEmit && npm run lint && prettier --check '**'",
+    "test": "TS_NODE_PROJECT=./tsconfig.test.json nyc --reporter=lcov --reporter=text-summary ava",
+    "lint": "eslint '**'",
+    "format": "prettier --write '**'",
+    "build": "rm -rf dist && microbundle --inline none",
+    "build:example": "rm -rf website-dist && parcel build example/index.html -d example-dist --public-url ./",
+    "start": "rm -rf example-dist && parcel example/index.html -d example-dist",
+    "precommit": "lint-staged",
+    "prepublishOnly": "npm run -s build"
+  },
+  "peerDependencies": {
+    "react": "^16.8.0",
+    "react-dom": "^16.8.0"
+  },
+  "devDependencies": {
+    "@testing-library/react-hooks": "^3.2.1",
+    "@types/react": "^16.9.35",
+    "@types/react-dom": "^16.9.8",
+    "@typescript-eslint/eslint-plugin": "^2.33.0",
+    "@typescript-eslint/parser": "^2.33.0",
+    "ava": "^3.8.2",
+    "eslint": "^7.0.0",
+    "eslint-plugin-ava": "^10.3.0",
+    "eslint-plugin-react": "^7.20.0",
+    "eslint-plugin-react-hooks": "^4.0.2",
+    "husky": "^4.2.5",
+    "lint-staged": "^10.2.2",
+    "microbundle": "^0.12.0",
+    "nyc": "^15.0.1",
+    "parcel": "^1.12.4",
+    "prettier": "^2.0.5",
+    "react": "^16.13.1",
+    "react-dom": "^16.13.1",
+    "ts-node": "^8.10.1",
+    "typescript": "^3.9.2"
+  },
+  "lint-staged": {
+    "*": [
+      "prettier --write",
+      "git add"
+    ]
+  },
+  "ava": {
+    "extensions": [
+      "ts",
+      "tsx"
+    ],
+    "require": [
+      "ts-node/register"
+    ]
+  },
+  "dependencies": {
+    "react-github-btn": "^1.2.0"
+  }
+}

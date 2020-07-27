@@ -1,0 +1,15 @@
+{
+	"useTabs": true,
+	"semi": false,
+	"trailingComma": "all",
+	"proseWrap": "always",
+	"arrowParens": "avoid",
+	"overrides": [
+		{
+			"files": ["README.md", "package.json"],
+			"options": {
+				"useTabs": false
+			}
+		}
+	]
+}

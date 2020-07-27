@@ -1,0 +1,14 @@
+node_modules
+.cache
+.github
+.rts2_cache_*
+dist
+example-dist
+LICENSE
+package-lock.json
+tsconfig.json
+tsconfig.*.json
+.*ignore
+*.md
+*.json
+*.html
