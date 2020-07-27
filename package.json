@@ -1,6 +1,6 @@
 {
   "name": "keybindings",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "description": "A tiny (~400 B) & modern library for keybindings.",
   "author": "Jamie Kyle <me@thejameskyle.com>",
   "license": "MIT",
