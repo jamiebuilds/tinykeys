@@ -1,0 +1,24 @@
+name: checks
+on: [push]
+jobs:
+  typecheck:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2-beta
+        with:
+          node-version: "14"
+      - uses: actions/cache@v1
+        with:
+          path: "~/.npm"
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+      - name: Install
+        run: npm install
+      - name: Typecheck
+        run: npm run check
+      - name: Lint
+        run: npm run lint
+      # - name: Test
+      #   run: npm run test

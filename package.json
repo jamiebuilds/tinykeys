@@ -36,7 +36,7 @@
     "lint": "eslint '**'",
     "format": "prettier --write '**'",
     "build": "rm -rf dist && microbundle --inline none",
-    "build:example": "rm -rf website-dist && parcel build example/index.html -d example-dist --public-url ./",
+    "build:example": "rm -rf example-dist && parcel build example/index.html -d example-dist --public-url ./",
     "start": "rm -rf example-dist && parcel example/index.html -d example-dist",
     "precommit": "lint-staged",
     "prepublishOnly": "npm run -s build"
