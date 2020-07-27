@@ -1,6 +1,7 @@
 # `tinykeys`
 
 > A tiny (~400 B) & modern library for keybindings.
+> [See Demo](https://jamiebuilds.github.io/tinykeys/)
 
 ## Install
 
