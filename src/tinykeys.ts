@@ -138,7 +138,7 @@ export default function keybindings(
 		})
 
 		clearTimeout(timer)
-		timer = setTimeout(possibleMatches.clear, TIMEOUT)
+		timer = setTimeout(possibleMatches.clear.bind(possibleMatches), TIMEOUT)
 	}
 
 	target.addEventListener("keydown", onKeyDown as any)
