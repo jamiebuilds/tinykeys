@@ -41,10 +41,6 @@
     "precommit": "lint-staged",
     "prepublishOnly": "npm run -s build"
   },
-  "peerDependencies": {
-    "react": "^16.8.0",
-    "react-dom": "^16.8.0"
-  },
   "devDependencies": {
     "@testing-library/react-hooks": "^3.2.1",
     "@types/react": "^16.9.35",
@@ -64,6 +60,7 @@
     "prettier": "^2.0.5",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
+    "react-github-btn": "^1.2.0",
     "ts-node": "^8.10.1",
     "typescript": "^3.9.2"
   },
@@ -82,7 +79,5 @@
       "ts-node/register"
     ]
   },
-  "dependencies": {
-    "react-github-btn": "^1.2.0"
-  }
+  "dependencies": {}
 }
