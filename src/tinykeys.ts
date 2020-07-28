@@ -61,14 +61,14 @@ function match(event: KeyboardEvent, press: KeyBindingPress): boolean {
 		) ||
 
 		// Ensure all the modifiers in the keybinding are pressed.
-		!!press[0].find(mod => {
+		press[0].find(mod => {
 			return !event.getModifierState(mod)
 		}) ||
 
 		// KEYBINDING_MODIFIER_KEYS (Shift/Control/etc) change the meaning of a
 		// keybinding. So if they are pressed but aren't part of this keybinding,
 		// then we don't have a match.
-		!!KEYBINDING_MODIFIER_KEYS.find(mod => {
+		KEYBINDING_MODIFIER_KEYS.find(mod => {
 			return !press[0].includes(mod) && event.getModifierState(mod)
 		})
 	)
