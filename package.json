@@ -8,6 +8,7 @@
   "source": "src/tinykeys.ts",
   "main": "dist/tinykeys.js",
   "module": "dist/tinykeys.module.js",
+  "unpkg": "dist/tinykeys.umd.js",
   "files": [
     "dist"
   ],
