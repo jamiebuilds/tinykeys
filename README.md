@@ -27,6 +27,34 @@ tinykeys(window, {
 })
 ```
 
+## Commonly used `key`'s and `code`'s
+
+Keybindings will be matched against
+[`KeyboardEvent.key`](https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/key)
+and[`KeyboardEvent.code`](https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/code/code_values)
+which may have some names you don't expect.
+
+| Windows       | macOS           | `key`         | `code`                     |
+| ------------- | --------------- | ------------- | -------------------------- |
+| N/A           | `Command` / `⌘` | `Meta`        | `MetaLeft` / `MetaRight`   |
+| `Alt`         | `Option` / `⌥`  | `Alt`         | `AltLeft` / `AltRight`     |
+| `Control`     | `Control` / `^` | `Control`     | `Control` / `AltRight`     |
+| `Shift`       | `Shift`         | `Shift`       | `ShiftLeft` / `ShiftRight` |
+| `1`, `2`, etc | `1`, `2`, etc   | `1`, `2`, etc | `Digit1`, `Digit2`, etc    |
+| `a`, `b`, etc | `a`, `b`, etc   | `a`, `b`, etc | `KeyA`, `KeyB`, etc        |
+| `Enter`       | `Return`        | `Enter`       | `Enter`                    |
+| `Esc`         | `Esc`           | `Escape`      | `Escape`                   |
+| `-`           | `-`             | `-`           | `Minus`                    |
+| `=`           | `=`             | `=`           | `Equal`                    |
+| `+`           | `+`             | `+`           | `Equal`\*                  |
+
+Something missing? Check out the key logger on the
+[demo website](https://jamiebuilds.github.io/tinykeys/)
+
+> _\* Some keys will have the same code as others because they appear on the
+> same key on the keyboard. Keep in mind how this is affected by international
+> keyboards which may have different layouts._
+
 ## Keybinding Syntax
 
 Keybindings are made up of a **_sequence_** of **_presses_**.
