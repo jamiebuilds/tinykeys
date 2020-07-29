@@ -34,19 +34,19 @@ Keybindings will be matched against
 and[`KeyboardEvent.code`](https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/code/code_values)
 which may have some names you don't expect.
 
-| Windows       | macOS           | `key`         | `code`                     |
-| ------------- | --------------- | ------------- | -------------------------- |
-| N/A           | `Command` / `⌘` | `Meta`        | `MetaLeft` / `MetaRight`   |
-| `Alt`         | `Option` / `⌥`  | `Alt`         | `AltLeft` / `AltRight`     |
-| `Control`     | `Control` / `^` | `Control`     | `Control` / `AltRight`     |
-| `Shift`       | `Shift`         | `Shift`       | `ShiftLeft` / `ShiftRight` |
-| `1`, `2`, etc | `1`, `2`, etc   | `1`, `2`, etc | `Digit1`, `Digit2`, etc    |
-| `a`, `b`, etc | `a`, `b`, etc   | `a`, `b`, etc | `KeyA`, `KeyB`, etc        |
-| `Enter`       | `Return`        | `Enter`       | `Enter`                    |
-| `Esc`         | `Esc`           | `Escape`      | `Escape`                   |
-| `-`           | `-`             | `-`           | `Minus`                    |
-| `=`           | `=`             | `=`           | `Equal`                    |
-| `+`           | `+`             | `+`           | `Equal`\*                  |
+| Windows       | macOS           | `key`         | `code`                         |
+| ------------- | --------------- | ------------- | ------------------------------ |
+| N/A           | `Command` / `⌘` | `Meta`        | `MetaLeft` / `MetaRight`       |
+| `Alt`         | `Option` / `⌥`  | `Alt`         | `AltLeft` / `AltRight`         |
+| `Control`     | `Control` / `^` | `Control`     | `ControlLeft` / `ControlRight` |
+| `Shift`       | `Shift`         | `Shift`       | `ShiftLeft` / `ShiftRight`     |
+| `1`, `2`, etc | `1`, `2`, etc   | `1`, `2`, etc | `Digit1`, `Digit2`, etc        |
+| `a`, `b`, etc | `a`, `b`, etc   | `a`, `b`, etc | `KeyA`, `KeyB`, etc            |
+| `Enter`       | `Return`        | `Enter`       | `Enter`                        |
+| `Esc`         | `Esc`           | `Escape`      | `Escape`                       |
+| `-`           | `-`             | `-`           | `Minus`                        |
+| `=`           | `=`             | `=`           | `Equal`                        |
+| `+`           | `+`             | `+`           | `Equal`\*                      |
 
 Something missing? Check out the key logger on the
 [demo website](https://jamiebuilds.github.io/tinykeys/)
