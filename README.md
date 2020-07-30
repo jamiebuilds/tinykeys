@@ -39,15 +39,16 @@ which may have some names you don't expect.
 | N/A           | `Command` / `⌘` | `Meta`        | `MetaLeft` / `MetaRight`       |
 | `Alt`         | `Option` / `⌥`  | `Alt`         | `AltLeft` / `AltRight`         |
 | `Control`     | `Control` / `^` | `Control`     | `ControlLeft` / `ControlRight` |
-| `Space`       | `Space`         | N/A           | `Space`                        |
 | `Shift`       | `Shift`         | `Shift`       | `ShiftLeft` / `ShiftRight`     |
-| `1`, `2`, etc | `1`, `2`, etc   | `1`, `2`, etc | `Digit1`, `Digit2`, etc        |
-| `a`, `b`, etc | `a`, `b`, etc   | `a`, `b`, etc | `KeyA`, `KeyB`, etc            |
+| `Space`       | `Space`         | N/A           | `Space`                        |
 | `Enter`       | `Return`        | `Enter`       | `Enter`                        |
 | `Esc`         | `Esc`           | `Escape`      | `Escape`                       |
+| `1`, `2`, etc | `1`, `2`, etc   | `1`, `2`, etc | `Digit1`, `Digit2`, etc        |
+| `a`, `b`, etc | `a`, `b`, etc   | `a`, `b`, etc | `KeyA`, `KeyB`, etc            |
 | `-`           | `-`             | `-`           | `Minus`                        |
 | `=`           | `=`             | `=`           | `Equal`                        |
 | `+`           | `+`             | `+`           | `Equal`\*                      |
+
 
 Something missing? Check out the key logger on the
 [demo website](https://jamiebuilds.github.io/tinykeys/)
