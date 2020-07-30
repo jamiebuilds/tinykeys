@@ -27,6 +27,27 @@ tinykeys(window, {
 })
 ```
 
+### React Hooks Example
+
+If you're using tinykeys within a component, you should also make use of the
+returned `unsubscribe()` function.
+
+```js
+import { useEffect } from "react"
+import tinykeys from "tinykeys"
+
+function useKeyboardShortcuts() {
+  useEffect(() => {
+    let unsubscribe = tinykeys({
+      // ...
+    })
+    return () => {
+      unsubscribe()
+    }
+  })
+}
+```
+
 ## Commonly used `key`'s and `code`'s
 
 Keybindings will be matched against
@@ -48,7 +69,6 @@ which may have some names you don't expect.
 | `-`           | `-`             | `-`           | `Minus`                        |
 | `=`           | `=`             | `=`           | `Equal`                        |
 | `+`           | `+`             | `+`           | `Equal`\*                      |
-
 
 Something missing? Check out the key logger on the
 [demo website](https://jamiebuilds.github.io/tinykeys/)
