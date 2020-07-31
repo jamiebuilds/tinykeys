@@ -21,7 +21,8 @@ tinykeys(window, {
   "y e e t": () => {
     alert("The keys 'y', 'e', 'e', and 't' were pressed in order")
   },
-  "$mod+KeyD": () => {
+  "$mod+KeyD": (event) => {
+    event.preventDefault()
     alert("Either 'Control+d' or 'Meta+d' were pressed")
   },
 })
