@@ -49,7 +49,7 @@ function useKeyboardShortcuts() {
 }
 ```
 
-## Commonly used `key`'s and `code`'s
+## Commonly used `key`s and `code`s
 
 Keybindings will be matched against
 [`KeyboardEvent.key`](https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/key)
