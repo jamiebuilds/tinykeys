@@ -39,7 +39,7 @@ import tinykeys from "tinykeys"
 
 function useKeyboardShortcuts() {
   useEffect(() => {
-    let unsubscribe = tinykeys({
+    let unsubscribe = tinykeys(window, {
       // ...
     })
     return () => {
