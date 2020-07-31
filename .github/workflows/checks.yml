@@ -17,7 +17,25 @@ jobs:
       - name: Install
         run: npm install
       - name: Typecheck
-        run: npm run check
+        run: npm run typecheck
+
+  format:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2-beta
+        with:
+          node-version: "14"
+      - uses: actions/cache@v1
+        with:
+          path: "~/.npm"
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+      - name: Install
+        run: npm install
+      - name: Format
+        run: npm run check:format
 
   lint:
     runs-on: ubuntu-latest

@@ -32,11 +32,13 @@
     "shortcuts"
   ],
   "scripts": {
-    "check": "tsc --noEmit && npm run lint && prettier --check '**'",
+    "check": "npm run -s typecheck && npm run -s lint && npm run -s check:format",
+    "typecheck": "tsc --noEmit",
     "test": "TS_NODE_PROJECT=./tsconfig.test.json nyc --reporter=lcov --reporter=text-summary ava",
     "lint": "eslint '**'",
     "format": "prettier --write '**'",
-    "build": "rm -rf dist && microbundle --inline none",
+    "check:format": "prettier --check '**'",
+    "build": "rm -rf dist && microbundle q--inline none",
     "build:example": "rm -rf example-dist && parcel build example/index.html -d example-dist --public-url ./",
     "start": "rm -rf example-dist && parcel example/index.html -d example-dist",
     "precommit": "lint-staged",
