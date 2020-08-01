@@ -117,7 +117,7 @@ export default function keybindings(
 			return
 		}
 
-		keyBindings.forEach(keyBinding => {
+		keyBindings.some(keyBinding => {
 			let sequence = keyBinding[0]
 			let callback = keyBinding[1]
 
@@ -134,6 +134,7 @@ export default function keybindings(
 			} else {
 				possibleMatches.delete(sequence)
 				callback(event)
+				return true
 			}
 		})
 
