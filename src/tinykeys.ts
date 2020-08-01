@@ -108,6 +108,13 @@ export default function keybindings(
 	let timer: any = null
 
 	let onKeyDown = (event: KeyboardEvent) => {
+		// Ensure and stop any event that isn't a full keyboard event.
+		// Autocomplete option navigation and selection would fire a instanceof Event,
+		// instead of the expected KeyboardEvent
+		if (!(event instanceof KeyboardEvent)) {
+			return
+		}
+
 		// Ignore modifier keydown events
 		// Note: This works because:
 		// - non-modifiers will always return false
