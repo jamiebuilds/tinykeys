@@ -117,10 +117,7 @@ export default function keybindings(
 			return
 		}
 
-		keyBindings.forEach(keyBinding => {
-			let sequence = keyBinding[0]
-			let callback = keyBinding[1]
-
+		for(let [sequence, callback] of keyBindings){
 			let prev = possibleMatches.get(sequence)
 			let remainingExpectedPresses = prev ? prev : sequence
 			let currentExpectedPress = remainingExpectedPresses[0]
@@ -135,7 +132,7 @@ export default function keybindings(
 				possibleMatches.delete(sequence)
 				callback(event)
 			}
-		})
+		}
 
 		clearTimeout(timer)
 		timer = setTimeout(possibleMatches.clear.bind(possibleMatches), TIMEOUT)
