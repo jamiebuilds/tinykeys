@@ -38,7 +38,7 @@
     "lint": "eslint '**'",
     "format": "prettier --write '**'",
     "check:format": "prettier --check '**'",
-    "build": "rm -rf dist && microbundle q--inline none",
+    "build": "rm -rf dist && microbundle --inline none",
     "build:example": "rm -rf example-dist && parcel build example/index.html -d example-dist --public-url ./",
     "start": "rm -rf example-dist && parcel example/index.html -d example-dist",
     "precommit": "lint-staged",
