@@ -23,7 +23,11 @@ let TIMEOUT = 1000
 /**
  * An alias for creating platform-specific keybinding aliases.
  */
-let MOD = typeof navigator === "object" && /Mac|iPod|iPhone|iPad/.test(navigator.platform) ? "Meta" : "Control"
+let MOD =
+	typeof navigator === "object" &&
+	/Mac|iPod|iPhone|iPad/.test(navigator.platform)
+		? "Meta"
+		: "Control"
 
 /**
  * Parses a "Key Binding String" into its parts
