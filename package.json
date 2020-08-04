@@ -1,6 +1,6 @@
 {
   "name": "tinykeys",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "A tiny (~400 B) & modern library for keybindings.",
   "author": "Jamie Kyle <me@thejameskyle.com>",
   "license": "MIT",
