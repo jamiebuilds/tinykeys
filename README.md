@@ -9,10 +9,12 @@
 npm install --save tinykeys
 ```
 
+Or for a CDN version, you can use it on [unpkg.com](https://unpkg.com/tinykeys)
+
 ## Usage
 
 ```js
-import tinykeys from "tinykeys"
+import tinykeys from "tinykeys" // Or `window.tinykeys` using the CDN version
 
 tinykeys(window, {
   "Shift+D": () => {
