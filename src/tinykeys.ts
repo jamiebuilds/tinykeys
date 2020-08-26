@@ -70,10 +70,10 @@ function match(event: KeyboardEvent, press: KeyBindingPress): boolean {
 		}) ||
 
 		// KEYBINDING_MODIFIER_KEYS (Shift/Control/etc) change the meaning of a
-		// keybinding. So if they are pressed but aren't part of this keybinding,
-		// then we don't have a match.
+		// keybinding. So if they are pressed but aren't part of the current
+		// keybinding press, then we don't have a match.
 		KEYBINDING_MODIFIER_KEYS.find(mod => {
-			return !press[0].includes(mod) && event.getModifierState(mod)
+			return !press[0].includes(mod) && press[1] !== mod && event.getModifierState(mod)
 		})
 	)
 }
@@ -119,15 +119,6 @@ export default function keybindings(
 			return
 		}
 
-		// Ignore modifier keydown events
-		// Note: This works because:
-		// - non-modifiers will always return false
-		// - if the current keypress is a modifier then it will return true when we check its state
-		// MDN: https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/getModifierState
-		if (event.getModifierState(event.key)) {
-			return
-		}
-
 		keyBindings.forEach(keyBinding => {
 			let sequence = keyBinding[0]
 			let callback = keyBinding[1]
@@ -139,7 +130,14 @@ export default function keybindings(
 			let matches = match(event, currentExpectedPress)
 
 			if (!matches) {
-				possibleMatches.delete(sequence)
+				// Modifier keydown events shouldn't break sequences
+				// Note: This works because:
+				// - non-modifiers will always return false
+				// - if the current keypress is a modifier then it will return true when we check its state
+				// MDN: https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/getModifierState
+				if (!event.getModifierState(event.key)) {
+					possibleMatches.delete(sequence)
+				}
 			} else if (remainingExpectedPresses.length > 1) {
 				possibleMatches.set(sequence, remainingExpectedPresses.slice(1))
 			} else {
