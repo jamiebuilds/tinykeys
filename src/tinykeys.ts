@@ -109,7 +109,7 @@ export default function keybindings(
 	})
 
 	let possibleMatches = new Map<KeyBindingPress[], KeyBindingPress[]>()
-	let timer: any = null
+	let timer: NodeJS.Timeout | null = null
 
 	let onKeyDown = (event: KeyboardEvent) => {
 		// Ensure and stop any event that isn't a full keyboard event.
@@ -146,12 +146,22 @@ export default function keybindings(
 			}
 		})
 
-		clearTimeout(timer)
+		if (timer) {
+			clearTimeout(timer)
+		}
+
 		timer = setTimeout(possibleMatches.clear.bind(possibleMatches), TIMEOUT)
 	}
 
-	target.addEventListener("keydown", onKeyDown as any)
+	target.addEventListener(
+		"keydown",
+		onKeyDown as EventListenerOrEventListenerObject,
+	)
+
 	return () => {
-		target.removeEventListener("keydown", onKeyDown as any)
+		target.removeEventListener(
+			"keydown",
+			onKeyDown as EventListenerOrEventListenerObject,
+		)
 	}
 }
