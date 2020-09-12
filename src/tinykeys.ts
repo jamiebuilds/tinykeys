@@ -103,7 +103,7 @@ function match(event: KeyboardEvent, press: KeyBindingPress): boolean {
 export default function keybindings(
 	target: Window | HTMLElement,
 	keyBindingMap: KeyBindingMap,
-) {
+): () => void {
 	let keyBindings = Object.keys(keyBindingMap).map(key => {
 		return [parse(key), keyBindingMap[key]] as const
 	})
@@ -111,7 +111,7 @@ export default function keybindings(
 	let possibleMatches = new Map<KeyBindingPress[], KeyBindingPress[]>()
 	let timer: NodeJS.Timeout | null = null
 
-	let onKeyDown = (event: KeyboardEvent) => {
+	let onKeyDown: EventListener = event => {
 		// Ensure and stop any event that isn't a full keyboard event.
 		// Autocomplete option navigation and selection would fire a instanceof Event,
 		// instead of the expected KeyboardEvent
@@ -153,15 +153,9 @@ export default function keybindings(
 		timer = setTimeout(possibleMatches.clear.bind(possibleMatches), TIMEOUT)
 	}
 
-	target.addEventListener(
-		"keydown",
-		onKeyDown as EventListenerOrEventListenerObject,
-	)
+	target.addEventListener("keydown", onKeyDown)
 
 	return () => {
-		target.removeEventListener(
-			"keydown",
-			onKeyDown as EventListenerOrEventListenerObject,
-		)
+		target.removeEventListener("keydown", onKeyDown)
 	}
 }
