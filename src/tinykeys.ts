@@ -1,10 +1,11 @@
-type KeyBindingPress = [string[], string]
+type KeyBindingPress = [string, string[], string]
+type KeyBindingCallback = (event: KeyboardEvent) => void
 
 /**
  * A map of keybinding strings to event handlers.
  */
 export interface KeyBindingMap {
-	[keybinding: string]: (event: KeyboardEvent) => void
+	[keybinding: string]: KeyBindingMap | KeyBindingCallback
 }
 
 /**
@@ -32,21 +33,15 @@ let MOD =
 /**
  * Parses a "Key Binding String" into its parts
  *
- * grammar    = `<sequence>`
- * <sequence> = `<press> <press> <press> ...`
+ * grammar    = `<press>`
  * <press>    = `<key>` or `<mods>+<key>`
  * <mods>     = `<mod>+<mod>+...`
  */
-function parse(str: string): KeyBindingPress[] {
-	return str
-		.trim()
-		.split(" ")
-		.map(press => {
-			let mods = press.split("+")
-			let key = mods.pop() as string
-			mods = mods.map(mod => (mod === "$mod" ? MOD : mod))
-			return [mods, key]
-		})
+function parse(str: string): KeyBindingPress {
+	let mods = str.split("+")
+	let key = mods.pop() as string
+	mods = mods.map(mod => (mod === "$mod" ? MOD : mod))
+	return [str, mods, key]
 }
 
 /**
@@ -60,12 +55,12 @@ function match(event: KeyboardEvent, press: KeyBindingPress): boolean {
 		// MDN event.key: https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/key
 		// MDN event.code: https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/code
 		(
-			press[1].toUpperCase() !== event.key.toUpperCase() &&
-			press[1] !== event.code
+			press[2].toUpperCase() !== event.key.toUpperCase() &&
+			press[2] !== event.code
 		) ||
 
 		// Ensure all the modifiers in the keybinding are pressed.
-		press[0].find(mod => {
+		press[1].find(mod => {
 			return !event.getModifierState(mod)
 		}) ||
 
@@ -73,7 +68,7 @@ function match(event: KeyboardEvent, press: KeyBindingPress): boolean {
 		// keybinding. So if they are pressed but aren't part of the current
 		// keybinding press, then we don't have a match.
 		KEYBINDING_MODIFIER_KEYS.find(mod => {
-			return !press[0].includes(mod) && press[1] !== mod && event.getModifierState(mod)
+			return !press[1].includes(mod) && press[2] !== mod && event.getModifierState(mod)
 		})
 	)
 }
@@ -104,12 +99,8 @@ export default function keybindings(
 	target: Window | HTMLElement,
 	keyBindingMap: KeyBindingMap,
 ): () => void {
-	let keyBindings = Object.keys(keyBindingMap).map(key => {
-		return [parse(key), keyBindingMap[key]] as const
-	})
-
-	let possibleMatches = new Map<KeyBindingPress[], KeyBindingPress[]>()
 	let timer: NodeJS.Timeout | null = null
+	let currentScope = keyBindingMap
 
 	let onKeyDown: EventListener = event => {
 		// Ensure and stop any event that isn't a full keyboard event.
@@ -119,38 +110,37 @@ export default function keybindings(
 			return
 		}
 
-		keyBindings.forEach(keyBinding => {
-			let sequence = keyBinding[0]
-			let callback = keyBinding[1]
+		let currentScopeKeyBindings = Object.keys(currentScope).map(parse)
 
-			let prev = possibleMatches.get(sequence)
-			let remainingExpectedPresses = prev ? prev : sequence
-			let currentExpectedPress = remainingExpectedPresses[0]
+		for (let index = 0; index < currentScopeKeyBindings.length; index++) {
+			let press = currentScopeKeyBindings[index]
+			let value = currentScope[press[0]]
 
-			let matches = match(event, currentExpectedPress)
-
-			if (!matches) {
+			if (match(event, press)) {
+				if (typeof value === "function") {
+					value(event)
+					currentScope = keyBindingMap
+				} else {
+					currentScope = value
+				}
+				break
+			} else if (!event.getModifierState(event.key)) {
 				// Modifier keydown events shouldn't break sequences
-				// Note: This works because:
+				// Note: The above works because:
 				// - non-modifiers will always return false
 				// - if the current keypress is a modifier then it will return true when we check its state
 				// MDN: https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/getModifierState
-				if (!event.getModifierState(event.key)) {
-					possibleMatches.delete(sequence)
-				}
-			} else if (remainingExpectedPresses.length > 1) {
-				possibleMatches.set(sequence, remainingExpectedPresses.slice(1))
-			} else {
-				possibleMatches.delete(sequence)
-				callback(event)
+				currentScope = keyBindingMap
 			}
-		})
+		}
 
 		if (timer) {
 			clearTimeout(timer)
 		}
 
-		timer = setTimeout(possibleMatches.clear.bind(possibleMatches), TIMEOUT)
+		timer = setTimeout(() => {
+			currentScope = keyBindingMap
+		}, TIMEOUT)
 	}
 
 	target.addEventListener("keydown", onKeyDown)
