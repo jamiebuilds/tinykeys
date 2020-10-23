@@ -9,9 +9,16 @@
   "main": "dist/tinykeys.js",
   "module": "dist/tinykeys.module.js",
   "unpkg": "dist/tinykeys.umd.js",
+  "types": "dist/tinykeys.d.ts",
   "files": [
     "dist"
   ],
+  "exports": {
+    ".": {
+      "import": "./dist/tinykeys.module.js",
+      "require": "./dist/tinykeys.js"
+    }
+  },
   "keywords": [
     "key",
     "keys",
