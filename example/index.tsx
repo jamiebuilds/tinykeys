@@ -6,6 +6,9 @@ tinykeys(window, {
 	},
 	y: {
 		e: {
+			"e ": () => {
+				alert("wow")
+			},
 			e: {
 				t: () => {
 					alert("The keys 'y', 'e', 'e', and 't' were pressed in order")

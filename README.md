@@ -13,6 +13,7 @@ Or for a CDN version, you can use it on [unpkg.com](https://unpkg.com/tinykeys)
 
 ## Usage
 
+<!-- prettier-ignore -->
 ```js
 import tinykeys from "tinykeys" // Or `window.tinykeys` using the CDN version
 
@@ -20,8 +21,14 @@ tinykeys(window, {
   "Shift+D": () => {
     alert("The 'Shift' and 'd' keys were pressed at the same time")
   },
-  "y e e t": () => {
-    alert("The keys 'y', 'e', 'e', and 't' were pressed in order")
+  "y": {
+    "e": {
+      "e": {
+        "t": () => {
+          alert("The keys 'y', 'e', 'e', and 't' were pressed in order")
+        },
+      },
+    },
   },
   "$mod+KeyD": event => {
     event.preventDefault()

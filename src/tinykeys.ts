@@ -38,7 +38,7 @@ let MOD =
  * <mods>     = `<mod>+<mod>+...`
  */
 function parse(str: string): KeyBindingPress {
-	let mods = str.split("+")
+	let mods = str.split("+").map(part => part.trim())
 	let key = mods.pop() as string
 	mods = mods.map(mod => (mod === "$mod" ? MOD : mod))
 	return [str, mods, key]
@@ -111,6 +111,7 @@ export default function keybindings(
 		}
 
 		let currentScopeKeyBindings = Object.keys(currentScope).map(parse)
+		let matchedScope
 
 		for (let index = 0; index < currentScopeKeyBindings.length; index++) {
 			let press = currentScopeKeyBindings[index]
@@ -121,17 +122,20 @@ export default function keybindings(
 					value(event)
 					currentScope = keyBindingMap
 				} else {
-					currentScope = value
+					matchedScope = value
 				}
-				break
-			} else if (!event.getModifierState(event.key)) {
-				// Modifier keydown events shouldn't break sequences
-				// Note: The above works because:
-				// - non-modifiers will always return false
-				// - if the current keypress is a modifier then it will return true when we check its state
-				// MDN: https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/getModifierState
-				currentScope = keyBindingMap
 			}
+		}
+
+		if (matchedScope) {
+			currentScope = matchedScope
+		} else if (!event.getModifierState(event.key)) {
+			// Modifier keydown events shouldn't break sequences
+			// Note: The above works because:
+			// - non-modifiers will always return false
+			// - if the current keypress is a modifier then it will return true when we check its state
+			// MDN: https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/getModifierState
+			currentScope = keyBindingMap
 		}
 
 		if (timer) {
