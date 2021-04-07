@@ -42,7 +42,7 @@ function parse(str: string): KeyBindingPress[] {
 		.trim()
 		.split(" ")
 		.map(press => {
-			let mods = press.split("+")
+			let mods = press.split(/(?<!\+)\+/)
 			let key = mods.pop() as string
 			mods = mods.map(mod => (mod === "$mod" ? MOD : mod))
 			return [mods, key]
