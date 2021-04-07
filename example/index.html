@@ -118,6 +118,22 @@ tinykeys(window, {
 			>
 			used by this library
 		</p>
+		<script>
+			customElements.define('open-shadow',
+				class extends HTMLElement {
+					constructor() {
+						super();
+
+						let pElem = document.createElement('input');
+
+						let shadowRoot = this.attachShadow({mode: 'open'})
+							.appendChild(pElem);
+				}
+			});
+		</script>
+		<open-shadow>
+			<input/>
+		</open-shadow>
 		<pre id="logs">(start typing)</pre>
 		<script src="./index.tsx"></script>
 		<script>
