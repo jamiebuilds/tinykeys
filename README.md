@@ -139,3 +139,32 @@ Each press can optionally be prefixed with modifier keys:
 ```
 
 Each press in the sequence must be pressed within 1000ms of the last.
+
+## Additional Configuration Options
+
+You can configure the behavior of tinykeys in a couple ways using a third
+`options` parameter.
+
+```js
+tinykey(window, {
+  "M": toggleMute,
+}, {
+  event: "keyup",
+})
+```
+
+### `options.event`
+
+Valid values: `"keydown"`, `"keyup"`
+
+Key presses will listen to this event (default: `"keydown"`).
+
+> **Note:** Do not pass `"keypress"`, it is deprecated in browsers.
+
+### `options.timeout`
+
+Keybinding sequences will wait this long between key presses before cancelling
+(default: `1000`).
+
+> **Note:** Setting this value too low (i.e. `300`) will be too fast for many
+> of your users.

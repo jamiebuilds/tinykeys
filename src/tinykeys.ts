@@ -8,6 +8,25 @@ export interface KeyBindingMap {
 }
 
 /**
+ * Options to configure the behavior of keybindings.
+ */
+ export interface KeyBindingOptions {
+  /**
+   * Key presses will listen to this event (default: "keydown").
+   */
+  event?: "keydown" | "keyup"
+
+  /**
+   * Keybinding sequences will wait this long between key presses before
+	 * cancelling (default: 1000).
+	 *
+	 * **Note:** Setting this value too low (i.e. `300`) will be too fast for many
+	 * of your users.
+   */
+  timeout?: number
+}
+
+/**
  * These are the modifier keys that change the meaning of keybindings.
  *
  * Note: Ignoring "AltGraph" because it is covered by the others.
@@ -16,9 +35,14 @@ let KEYBINDING_MODIFIER_KEYS = ["Shift", "Meta", "Alt", "Control"]
 
 /**
  * Keybinding sequences should timeout if individual key presses are more than
- * 1s apart.
+ * 1s apart by default.
  */
-let TIMEOUT = 1000
+let DEFAULT_TIMEOUT = 1000
+
+/**
+ * Keybinding sequences should bind to this event by default.
+ */
+ let DEFAULT_EVENT = "keydown"
 
 /**
  * An alias for creating platform-specific keybinding aliases.
@@ -103,15 +127,19 @@ function match(event: KeyboardEvent, press: KeyBindingPress): boolean {
 export default function keybindings(
 	target: Window | HTMLElement,
 	keyBindingMap: KeyBindingMap,
+	options: KeyBindingOptions = {},
 ): () => void {
+	let timeout = options.timeout ?? DEFAULT_TIMEOUT
+	let event = options.event ?? DEFAULT_EVENT
+
 	let keyBindings = Object.keys(keyBindingMap).map(key => {
 		return [parse(key), keyBindingMap[key]] as const
 	})
 
 	let possibleMatches = new Map<KeyBindingPress[], KeyBindingPress[]>()
-	let timer: NodeJS.Timeout | null = null
+	let timer: number | null = null
 
-	let onKeyDown: EventListener = event => {
+	let onKeyEvent: EventListener = event => {
 		// Ensure and stop any event that isn't a full keyboard event.
 		// Autocomplete option navigation and selection would fire a instanceof Event,
 		// instead of the expected KeyboardEvent
@@ -150,12 +178,12 @@ export default function keybindings(
 			clearTimeout(timer)
 		}
 
-		timer = setTimeout(possibleMatches.clear.bind(possibleMatches), TIMEOUT)
+		timer = setTimeout(possibleMatches.clear.bind(possibleMatches), timeout)
 	}
 
-	target.addEventListener("keydown", onKeyDown)
+	target.addEventListener(event, onKeyEvent)
 
 	return () => {
-		target.removeEventListener("keydown", onKeyDown)
+		target.removeEventListener(event, onKeyEvent)
 	}
 }
