@@ -54,6 +54,16 @@ let MOD =
 		: "Control"
 
 /**
+ * There's a bug in Chrome that causes event.getModifierState not to exist on
+ * KeyboardEvent's for F1/F2/etc keys.
+ */
+function getModifierState(event: KeyboardEvent, mod: string) {
+	return typeof event.getModifierState === "function"
+		? event.getModifierState(mod)
+		: false
+}
+
+/**
  * Parses a "Key Binding String" into its parts
  *
  * grammar    = `<sequence>`
@@ -90,14 +100,14 @@ function match(event: KeyboardEvent, press: KeyBindingPress): boolean {
 
 		// Ensure all the modifiers in the keybinding are pressed.
 		press[0].find(mod => {
-			return !event.getModifierState(mod)
+			return !getModifierState(event, mod)
 		}) ||
 
 		// KEYBINDING_MODIFIER_KEYS (Shift/Control/etc) change the meaning of a
 		// keybinding. So if they are pressed but aren't part of the current
 		// keybinding press, then we don't have a match.
 		KEYBINDING_MODIFIER_KEYS.find(mod => {
-			return !press[0].includes(mod) && press[1] !== mod && event.getModifierState(mod)
+			return !press[0].includes(mod) && press[1] !== mod && getModifierState(event, mod)
 		})
 	)
 }
@@ -163,7 +173,7 @@ export default function keybindings(
 				// - non-modifiers will always return false
 				// - if the current keypress is a modifier then it will return true when we check its state
 				// MDN: https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/getModifierState
-				if (!event.getModifierState(event.key)) {
+				if (!getModifierState(event, event.key)) {
 					possibleMatches.delete(sequence)
 				}
 			} else if (remainingExpectedPresses.length > 1) {
