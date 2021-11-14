@@ -10,4 +10,7 @@ tinykeys(window, {
 	"$mod+KeyD": () => {
 		alert("Either 'Control+d' or 'Meta+d' were pressed")
 	},
+	"?": () => {
+		alert("The key '?' was pressed")
+	},
 })
