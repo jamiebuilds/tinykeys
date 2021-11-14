@@ -10,20 +10,20 @@ export interface KeyBindingMap {
 /**
  * Options to configure the behavior of keybindings.
  */
- export interface KeyBindingOptions {
-  /**
-   * Key presses will listen to this event (default: "keydown").
-   */
-  event?: "keydown" | "keyup"
+export interface KeyBindingOptions {
+	/**
+	 * Key presses will listen to this event (default: "keydown").
+	 */
+	event?: "keydown" | "keyup"
 
-  /**
-   * Keybinding sequences will wait this long between key presses before
+	/**
+	 * Keybinding sequences will wait this long between key presses before
 	 * cancelling (default: 1000).
 	 *
 	 * **Note:** Setting this value too low (i.e. `300`) will be too fast for many
 	 * of your users.
-   */
-  timeout?: number
+	 */
+	timeout?: number
 }
 
 /**
@@ -42,7 +42,7 @@ let DEFAULT_TIMEOUT = 1000
 /**
  * Keybinding sequences should bind to this event by default.
  */
- let DEFAULT_EVENT = "keydown"
+let DEFAULT_EVENT = "keydown"
 
 /**
  * An alias for creating platform-specific keybinding aliases.
@@ -88,6 +88,11 @@ function parse(str: string): KeyBindingPress[] {
  * partially or exactly.
  */
 function match(event: KeyboardEvent, press: KeyBindingPress): boolean {
+	// match special characters like '?' and '!'
+	if (/^[^A-Za-z0-9]$/.test(event.key) && press[1] === event.key) {
+		return true
+	}
+
 	// prettier-ignore
 	return !(
 		// Allow either the `event.key` or the `event.code`
