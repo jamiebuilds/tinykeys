@@ -7,23 +7,34 @@ export interface KeyBindingMap {
 	[keybinding: string]: (event: KeyboardEvent) => void
 }
 
-/**
- * Options to configure the behavior of keybindings.
- */
- export interface KeyBindingOptions {
-  /**
-   * Key presses will listen to this event (default: "keydown").
-   */
-  event?: "keydown" | "keyup"
-
-  /**
-   * Keybinding sequences will wait this long between key presses before
+export interface KeyBindingHandlerOptions {
+	/**
+	 * Keybinding sequences will wait this long between key presses before
 	 * cancelling (default: 1000).
 	 *
 	 * **Note:** Setting this value too low (i.e. `300`) will be too fast for many
 	 * of your users.
-   */
-  timeout?: number
+	 */
+	timeout?: number
+}
+
+/**
+ * Options to configure the behavior of keybindings.
+ */
+export interface KeyBindingOptions extends KeyBindingHandlerOptions {
+	/**
+	 * Key presses will listen to this event (default: "keydown").
+	 */
+	event?: "keydown" | "keyup"
+
+	/**
+	 * Keybinding sequences will wait this long between key presses before
+	 * cancelling (default: 1000).
+	 *
+	 * **Note:** Setting this value too low (i.e. `300`) will be too fast for many
+	 * of your users.
+	 */
+	timeout?: number
 }
 
 /**
@@ -42,7 +53,7 @@ let DEFAULT_TIMEOUT = 1000
 /**
  * Keybinding sequences should bind to this event by default.
  */
- let DEFAULT_EVENT = "keydown"
+let DEFAULT_EVENT = "keydown"
 
 /**
  * An alias for creating platform-specific keybinding aliases.
@@ -113,15 +124,13 @@ function match(event: KeyboardEvent, press: KeyBindingPress): boolean {
 }
 
 /**
- * Subscribes to keybindings.
- *
- * Returns an unsubscribe method.
+ * Creates an event listener for handling keybindings.
  *
  * @example
  * ```js
- * import keybindings from "../src/keybindings"
+ * import { createKeybindingsHandler } from "../src/keybindings"
  *
- * keybindings(window, {
+ * let handler = createKeybindingsHandler({
  * 	"Shift+d": () => {
  * 		alert("The 'Shift' and 'd' keys were pressed at the same time")
  * 	},
@@ -132,15 +141,15 @@ function match(event: KeyboardEvent, press: KeyBindingPress): boolean {
  * 		alert("Either 'Control+d' or 'Meta+d' were pressed")
  * 	},
  * })
+ *
+ * window.addEvenListener("keydown", handler)
  * ```
  */
-export default function keybindings(
-	target: Window | HTMLElement,
+export function createKeybindingsHandler(
 	keyBindingMap: KeyBindingMap,
-	options: KeyBindingOptions = {},
-): () => void {
+	options: KeyBindingHandlerOptions = {},
+): EventListener {
 	let timeout = options.timeout ?? DEFAULT_TIMEOUT
-	let event = options.event ?? DEFAULT_EVENT
 
 	let keyBindings = Object.keys(keyBindingMap).map(key => {
 		return [parse(key), keyBindingMap[key]] as const
@@ -149,7 +158,7 @@ export default function keybindings(
 	let possibleMatches = new Map<KeyBindingPress[], KeyBindingPress[]>()
 	let timer: number | null = null
 
-	let onKeyEvent: EventListener = event => {
+	return event => {
 		// Ensure and stop any event that isn't a full keyboard event.
 		// Autocomplete option navigation and selection would fire a instanceof Event,
 		// instead of the expected KeyboardEvent
@@ -190,6 +199,37 @@ export default function keybindings(
 
 		timer = setTimeout(possibleMatches.clear.bind(possibleMatches), timeout)
 	}
+}
+
+/**
+ * Subscribes to keybindings.
+ *
+ * Returns an unsubscribe method.
+ *
+ * @example
+ * ```js
+ * import keybindings from "../src/keybindings"
+ *
+ * keybindings(window, {
+ * 	"Shift+d": () => {
+ * 		alert("The 'Shift' and 'd' keys were pressed at the same time")
+ * 	},
+ * 	"y e e t": () => {
+ * 		alert("The keys 'y', 'e', 'e', and 't' were pressed in order")
+ * 	},
+ * 	"$mod+d": () => {
+ * 		alert("Either 'Control+d' or 'Meta+d' were pressed")
+ * 	},
+ * })
+ * ```
+ */
+export default function keybindings(
+	target: Window | HTMLElement,
+	keyBindingMap: KeyBindingMap,
+	options: KeyBindingOptions = {},
+): () => void {
+	let event = options.event ?? DEFAULT_EVENT
+	let onKeyEvent = createKeybindingsHandler(keyBindingMap, options)
 
 	target.addEventListener(event, onKeyEvent)
 
