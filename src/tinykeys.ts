@@ -82,7 +82,7 @@ function getModifierState(event: KeyboardEvent, mod: string) {
  * <press>    = `<key>` or `<mods>+<key>`
  * <mods>     = `<mod>+<mod>+...`
  */
-function parse(str: string): KeyBindingPress[] {
+export function parseKeybinding(str: string): KeyBindingPress[] {
 	return str
 		.trim()
 		.split(" ")
@@ -152,7 +152,7 @@ export function createKeybindingsHandler(
 	let timeout = options.timeout ?? DEFAULT_TIMEOUT
 
 	let keyBindings = Object.keys(keyBindingMap).map(key => {
-		return [parse(key), keyBindingMap[key]] as const
+		return [parseKeybinding(key), keyBindingMap[key]] as const
 	})
 
 	let possibleMatches = new Map<KeyBindingPress[], KeyBindingPress[]>()
