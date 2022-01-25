@@ -161,6 +161,25 @@ Each press can optionally be prefixed with modifier keys:
 
 Each press in the sequence must be pressed within 1000ms of the last.
 
+### Display the keyboard sequence
+
+You can use the `parseKeybinding` method to get a structured representation of a keyboard shortcut. It can be useful when you want to display it in a fancier way than a plain string.
+
+```js
+import { parseKeybinding } from "tinykeys"
+
+let parsedShortcut = parseKeybinding('$mod+Shift+K $mod+1');
+```
+
+Results into:
+
+```js
+[
+  [["Meta", "Shift"], "K"],
+  [["Meta"], "1"],
+]
+```
+
 ## Additional Configuration Options
 
 You can configure the behavior of tinykeys in a couple ways using a third
