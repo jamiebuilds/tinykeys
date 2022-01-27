@@ -30,7 +30,8 @@ tinykeys(window, {
 })
 ```
 
-Alternatively, if you want to only create the keybinding handler, and register it as an event listener yourself:
+Alternatively, if you want to only create the keybinding handler, and register
+it as an event listener yourself:
 
 ```js
 import { createKeybindingsHandler } from "tinykeys"
@@ -163,18 +164,20 @@ Each press in the sequence must be pressed within 1000ms of the last.
 
 ### Display the keyboard sequence
 
-You can use the `parseKeybinding` method to get a structured representation of a keyboard shortcut. It can be useful when you want to display it in a fancier way than a plain string.
+You can use the `parseKeybinding` method to get a structured representation of a
+keyboard shortcut. It can be useful when you want to display it in a fancier way
+than a plain string.
 
 ```js
 import { parseKeybinding } from "tinykeys"
 
-let parsedShortcut = parseKeybinding('$mod+Shift+K $mod+1');
+let parsedShortcut = parseKeybinding("$mod+Shift+K $mod+1")
 ```
 
 Results into:
 
 ```js
-[
+;[
   [["Meta", "Shift"], "K"],
   [["Meta"], "1"],
 ]
@@ -186,11 +189,15 @@ You can configure the behavior of tinykeys in a couple ways using a third
 `options` parameter.
 
 ```js
-tinykey(window, {
-  "M": toggleMute,
-}, {
-  event: "keyup",
-})
+tinykey(
+  window,
+  {
+    M: toggleMute,
+  },
+  {
+    event: "keyup",
+  },
+)
 ```
 
 ### `options.event`
@@ -206,5 +213,5 @@ Key presses will listen to this event (default: `"keydown"`).
 Keybinding sequences will wait this long between key presses before cancelling
 (default: `1000`).
 
-> **Note:** Setting this value too low (i.e. `300`) will be too fast for many
-> of your users.
+> **Note:** Setting this value too low (i.e. `300`) will be too fast for many of
+> your users.
