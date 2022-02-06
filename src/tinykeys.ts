@@ -26,15 +26,6 @@ export interface KeyBindingOptions extends KeyBindingHandlerOptions {
 	 * Key presses will listen to this event (default: "keydown").
 	 */
 	event?: "keydown" | "keyup"
-
-	/**
-	 * Keybinding sequences will wait this long between key presses before
-	 * cancelling (default: 1000).
-	 *
-	 * **Note:** Setting this value too low (i.e. `300`) will be too fast for many
-	 * of your users.
-	 */
-	timeout?: number
 }
 
 /**
