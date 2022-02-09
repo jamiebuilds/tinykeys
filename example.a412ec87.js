@@ -3,4 +3,4 @@ parcelRequire=function(e,r,t,n){var i,o="function"==typeof parcelRequire&&parcel
 },{}],"zo2T":[function(require,module,exports) {
 "use strict";var e=t(require("../src/tinykeys"));function t(e){return e&&e.__esModule?e:{default:e}}(0,e.default)(window,{"Shift+D":function(){alert("The 'Shift' and 'd' keys were pressed at the same time")},"y e e t":function(){alert("The keys 'y', 'e', 'e', and 't' were pressed in order")},"$mod+KeyD":function(){alert("Either 'Control+d' or 'Meta+d' were pressed")}});
 },{"../src/tinykeys":"WwaX"}]},{},["zo2T"], null)
-//# sourceMappingURL=example.d3a536bf.js.map
+//# sourceMappingURL=example.a412ec87.js.map
