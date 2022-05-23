@@ -1,4 +1,4 @@
-import tinykeys from "../src/tinykeys"
+import { tinykeys } from "../src/tinykeys"
 
 tinykeys(window, {
 	"Shift+D": () => {

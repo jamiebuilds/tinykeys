@@ -214,7 +214,7 @@ export function createKeybindingsHandler(
  * })
  * ```
  */
-export default function keybindings(
+function keybindings(
 	target: Window | HTMLElement,
 	keyBindingMap: KeyBindingMap,
 	options: KeyBindingOptions = {},
@@ -228,3 +228,5 @@ export default function keybindings(
 		target.removeEventListener(event, onKeyEvent)
 	}
 }
+
+export { keybindings as tinykeys }
