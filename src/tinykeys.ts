@@ -199,9 +199,9 @@ export function createKeybindingsHandler(
  *
  * @example
  * ```js
- * import keybindings from "../src/keybindings"
+ * import { tinykeys } from "../src/tinykeys"
  *
- * keybindings(window, {
+ * tinykeys(window, {
  * 	"Shift+d": () => {
  * 		alert("The 'Shift' and 'd' keys were pressed at the same time")
  * 	},
@@ -214,7 +214,7 @@ export function createKeybindingsHandler(
  * })
  * ```
  */
-function keybindings(
+export function tinykeys(
 	target: Window | HTMLElement,
 	keyBindingMap: KeyBindingMap,
 	options: KeyBindingOptions = {},
@@ -228,5 +228,3 @@ function keybindings(
 		target.removeEventListener(event, onKeyEvent)
 	}
 }
-
-export { keybindings as tinykeys }
