@@ -1,5 +1,3 @@
-type KeyBindingPress = [string[], string]
-
 /**
  * A map of keybinding strings to event handlers.
  */
@@ -33,23 +31,23 @@ export interface KeyBindingOptions extends KeyBindingHandlerOptions {
  *
  * Note: Ignoring "AltGraph" because it is covered by the others.
  */
-let KEYBINDING_MODIFIER_KEYS = ["Shift", "Meta", "Alt", "Control"]
+const KEYBINDING_MODIFIER_KEYS = ["Shift", "Meta", "Alt", "Control"]
 
 /**
  * Keybinding sequences should timeout if individual key presses are more than
  * 1s apart by default.
  */
-let DEFAULT_TIMEOUT = 1000
+const DEFAULT_TIMEOUT = 1000
 
 /**
  * Keybinding sequences should bind to this event by default.
  */
-let DEFAULT_EVENT = "keydown"
+const DEFAULT_EVENT = "keydown"
 
 /**
  * An alias for creating platform-specific keybinding aliases.
  */
-let MOD =
+const MOD =
 	typeof navigator === "object" &&
 	/Mac|iPod|iPhone|iPad/.test(navigator.platform)
 		? "Meta"
@@ -66,52 +64,30 @@ function getModifierState(event: KeyboardEvent, mod: string) {
 }
 
 /**
- * Parses a "Key Binding String" into its parts
+ * Parses a "Key Binding String" into its parts.
  *
- * grammar    = `<sequence>`
- * <sequence> = `<press> <press> <press> ...`
- * <press>    = `<key>` or `<mods>+<key>`
- * <mods>     = `<mod>+<mod>+...`
+ * E.g.
+ *
+ * Given the key binding string of "$mod+Alt+s Shift+a" on
+ * a macOS computer:
+ * - [{ mods: ["Meta", "Alt"], key: "s" }, { mods: ["Shift"], key: "a" }]
  */
-export function parseKeybinding(str: string): KeyBindingPress[] {
-	return str
+export function parseKeybinding(binding: string) {
+	return binding
 		.trim()
 		.split(" ")
 		.map(press => {
 			let mods = press.split(/\b\+/)
-			let key = mods.pop() as string
+			const key = mods.pop() as string
 			mods = mods.map(mod => (mod === "$mod" ? MOD : mod))
-			return [mods, key]
+			return { mods, key }
 		})
 }
 
-/**
- * This tells us if a series of events matches a key binding sequence either
- * partially or exactly.
- */
-function match(event: KeyboardEvent, press: KeyBindingPress): boolean {
-	// prettier-ignore
-	return !(
-		// Allow either the `event.key` or the `event.code`
-		// MDN event.key: https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/key
-		// MDN event.code: https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/code
-		(
-			press[1].toUpperCase() !== event.key.toUpperCase() &&
-			press[1] !== event.code
-		) ||
+function arraysAreEqual(a: string[], b: string[]): boolean {
+	if (a.length !== b.length) return false
 
-		// Ensure all the modifiers in the keybinding are pressed.
-		press[0].find(mod => {
-			return !getModifierState(event, mod)
-		}) ||
-
-		// KEYBINDING_MODIFIER_KEYS (Shift/Control/etc) change the meaning of a
-		// keybinding. So if they are pressed but aren't part of the current
-		// keybinding press, then we don't have a match.
-		KEYBINDING_MODIFIER_KEYS.find(mod => {
-			return !press[0].includes(mod) && press[1] !== mod && getModifierState(event, mod)
-		})
-	)
+	return a.every(c => b.includes(c))
 }
 
 /**
@@ -140,14 +116,66 @@ export function createKeybindingsHandler(
 	keyBindingMap: KeyBindingMap,
 	options: KeyBindingHandlerOptions = {},
 ): EventListener {
-	let timeout = options.timeout ?? DEFAULT_TIMEOUT
+	const timeout = options.timeout ?? DEFAULT_TIMEOUT
 
-	let keyBindings = Object.keys(keyBindingMap).map(key => {
-		return [parseKeybinding(key), keyBindingMap[key]] as const
-	})
+	const keyBindings = Object.entries(keyBindingMap).map(
+		([key, entry]) => [parseKeybinding(key), entry] as const,
+	)
 
-	let possibleMatches = new Map<KeyBindingPress[], KeyBindingPress[]>()
-	let timer: number | null = null
+	// To support sequence-style hotkeys, every time the user
+	// presses a key we parse that key and add it to the
+	// currentSequence.
+	//
+	// Example:
+	// 1. User presses "g"
+	//    - currentSequence is an array containing:
+	//    - { mods: [], key: "g", code: "KeyG" }
+	// 2. 500ms later user presses and holds "Alt".
+	//    - currentSequence is an array containing:
+	//    - { mods: [], key: "g", code: "KeyG" }
+	//    - { mods: ["Alt"], key: "Alt", code: "AltLeft" }
+	// 3. 500ms later user presses and holds "Meta".
+	//    - currentSequence is an array containing:
+	//    - { mods: [], key: "g", code: "KeyG" }
+	//    - { mods: ["Alt", "Meta"], key: "Meta", code: "MetaLeft" }
+	// 4. 200ms later user releases "Alt"
+	// 5. 500ms later user presses "s"
+	//    - currentSequence is an array containing:
+	//    - { mods: [], key: "g", code: "KeyG" }
+	//    - { mods: ["Alt", "Meta"], key: "Meta", code: "MetaLeft" }
+	//    - { mods: ["Meta"], key: "s", code: "KeyS" }
+	// 6. 500ms later user presses "a"
+	//    - currentSequence is an array containing:
+	//    - { mods: [], key: "g", code: "KeyG" }
+	//    - { mods: ["Alt", "Meta"], key: "Meta", code: "MetaLeft" }
+	//    - { mods: ["Meta"], key: "s", code: "KeyS" }
+	//    - { mods: ["Meta"], key: "a", code: "KeyA" }
+	// 7. 200ms later user releases "Meta"
+	// 8. 500ms later user presses (and releases) "Meta"
+	//    - currentSequence is an array containing:
+	//    - { mods: [], key: "g", code: "KeyG" }
+	//    - { mods: ["Alt", "Meta"], key: "Meta", code: "MetaLeft" }
+	//    - { mods: ["Meta"], key: "s", code: "KeyS" }
+	//    - { mods: ["Meta"], key: "a", code: "KeyA" }
+	//    - { mods: ["Meta"], key: "Meta", code: "MetaLeft" }
+	// 9. 500ms later user presses "a"
+	//    - currentSequence is an array containing:
+	//    - { mods: [], key: "g", code: "KeyG" }
+	//    - { mods: ["Alt", "Meta"], key: "Meta", code: "MetaLeft" }
+	//    - { mods: ["Meta"], key: "s", code: "KeyS" }
+	//    - { mods: ["Meta"], key: "a", code: "KeyA" }
+	//    - { mods: ["Meta"], key: "Meta", code: "MetaLeft" }
+	//    - { mods: [], key: "a", code: "KeyA" }
+	// 10. 1000ms later user hasn't pressed anything else so
+	//     the currentSequence is reset by a `setTimeout()`.
+	//    - currentSequence === []
+	let currentSequence: Array<{
+		mods: string[]
+		key: string
+		code: string
+	}> = []
+
+	const timeoutsStore = new Set<number>()
 
 	return event => {
 		// Ensure and stop any event that isn't a full keyboard event.
@@ -157,38 +185,101 @@ export function createKeybindingsHandler(
 			return
 		}
 
+		timeoutsStore.forEach(timeoutId => clearTimeout(timeoutId))
+		timeoutsStore.clear()
+
+		const currentMods = KEYBINDING_MODIFIER_KEYS.filter(key =>
+			getModifierState(event, key),
+		)
+
+		const prevKeypressInSequence = currentSequence.at(-1)
+
+		const wasPrevKeyAModifier = prevKeypressInSequence
+			? KEYBINDING_MODIFIER_KEYS.includes(prevKeypressInSequence.key)
+			: false
+
+		if (
+			wasPrevKeyAModifier &&
+			// Will always be non-null when `wasPrevKeyAModifier === true`.
+			// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+			prevKeypressInSequence!.mods.every(key => currentMods.includes(key))
+		) {
+			// in this case, we'll replace the previous entry with
+			// the current one.
+			currentSequence.pop()
+		}
+
+		currentSequence.push({
+			mods: currentMods,
+			key: event.key,
+			code: event.code,
+		})
+
+		const matchedBindings: typeof keyBindings = []
+
+		/**
+		 * A keybinding is *either* "matched" or "possibly matched"
+		 * or "not matched".
+		 */
+		const possibleMatchedBindings: typeof keyBindings = []
+
 		keyBindings.forEach(keyBinding => {
-			let sequence = keyBinding[0]
-			let callback = keyBinding[1]
+			const [bindingSequence] = keyBinding
 
-			let prev = possibleMatches.get(sequence)
-			let remainingExpectedPresses = prev ? prev : sequence
-			let currentExpectedPress = remainingExpectedPresses[0]
+			const isPotentialMatch = currentSequence.every(
+				(currentSequencePart, index) => {
+					const keyBindingPart = bindingSequence.at(index)
 
-			let matches = match(event, currentExpectedPress)
+					if (
+						!keyBindingPart ||
+						!arraysAreEqual(keyBindingPart.mods, currentSequencePart.mods)
+					) {
+						return false
+					}
 
-			if (!matches) {
-				// Modifier keydown events shouldn't break sequences
-				// Note: This works because:
-				// - non-modifiers will always return false
-				// - if the current keypress is a modifier then it will return true when we check its state
-				// MDN: https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/getModifierState
-				if (!getModifierState(event, event.key)) {
-					possibleMatches.delete(sequence)
-				}
-			} else if (remainingExpectedPresses.length > 1) {
-				possibleMatches.set(sequence, remainingExpectedPresses.slice(1))
+					return (
+						keyBindingPart.key === currentSequencePart.key ||
+						keyBindingPart.key === currentSequencePart.code
+					)
+				},
+			)
+
+			if (!isPotentialMatch) return
+
+			if (currentSequence.length !== bindingSequence.length) {
+				possibleMatchedBindings.push(keyBinding)
 			} else {
-				possibleMatches.delete(sequence)
-				callback(event)
+				matchedBindings.push(keyBinding)
 			}
 		})
 
-		if (timer) {
-			clearTimeout(timer)
+		if (possibleMatchedBindings.length === 0) {
+			currentSequence = []
+
+			matchedBindings.forEach(keyBinding => {
+				const [, callback] = keyBinding
+				callback(event)
+			})
+
+			return
 		}
 
-		timer = setTimeout(possibleMatches.clear.bind(possibleMatches), timeout)
+		matchedBindings.forEach(keyBinding => {
+			const [, callback] = keyBinding
+
+			const timeoutId = setTimeout(
+				callback,
+				timeout,
+				event,
+			) as unknown as number
+
+			timeoutsStore.add(timeoutId)
+		})
+
+		setTimeout(() => {
+			currentSequence = []
+			timeoutsStore.clear()
+		}, timeout)
 	}
 }
 
