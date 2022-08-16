@@ -16,6 +16,12 @@ export interface KeyBindingHandlerOptions {
 	 * of your users.
 	 */
 	timeout?: number
+
+	/**
+	 * Boolean for if the repeated events (i.e. when holding down the shortcut) are to be counted
+	 * This is false by default
+	 */
+	allowRepeat?: boolean
 }
 
 /**
@@ -138,7 +144,7 @@ function match(event: KeyboardEvent, press: KeyBindingPress): boolean {
  */
 export function createKeybindingsHandler(
 	keyBindingMap: KeyBindingMap,
-	options: KeyBindingHandlerOptions = {},
+	options: KeyBindingHandlerOptions = { allowRepeat: true },
 ): EventListener {
 	let timeout = options.timeout ?? DEFAULT_TIMEOUT
 
@@ -154,6 +160,10 @@ export function createKeybindingsHandler(
 		// Autocomplete option navigation and selection would fire a instanceof Event,
 		// instead of the expected KeyboardEvent
 		if (!(event instanceof KeyboardEvent)) {
+			return
+		}
+
+		if (!options.allowRepeat && event.repeat) {
 			return
 		}
 
