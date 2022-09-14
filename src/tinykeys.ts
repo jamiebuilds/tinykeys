@@ -26,6 +26,7 @@ export interface KeyBindingOptions extends KeyBindingHandlerOptions {
 	 * Key presses will listen to this event (default: "keydown").
 	 */
 	event?: "keydown" | "keyup"
+	useCapture?: boolean
 }
 
 /**
@@ -45,6 +46,11 @@ let DEFAULT_TIMEOUT = 1000
  * Keybinding sequences should bind to this event by default.
  */
 let DEFAULT_EVENT = "keydown"
+
+/**
+ * Use capture phase for event instead of bubbling
+ */
+let DEFAULT_USE_CAPTURE = false;
 
 /**
  * An alias for creating platform-specific keybinding aliases.
@@ -220,9 +226,10 @@ export function tinykeys(
 	options: KeyBindingOptions = {},
 ): () => void {
 	let event = options.event ?? DEFAULT_EVENT
+	let useCapture = options.useCapture ?? DEFAULT_USE_CAPTURE;
 	let onKeyEvent = createKeybindingsHandler(keyBindingMap, options)
 
-	target.addEventListener(event, onKeyEvent)
+	target.addEventListener(event, onKeyEvent, useCapture)
 
 	return () => {
 		target.removeEventListener(event, onKeyEvent)
