@@ -7,7 +7,7 @@ tinykeys(window, {
 	"y e e t": () => {
 		alert("The keys 'y', 'e', 'e', and 't' were pressed in order")
 	},
-	"$mod+KeyD": () => {
-		alert("Either 'Control+d' or 'Meta+d' were pressed")
+	"$mod+KeyU": () => {
+		alert("Either 'Control+u' or 'Meta+u' were pressed")
 	},
 })

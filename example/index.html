@@ -4,69 +4,8 @@
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<title>tinykeys</title>
+		<script src="https://cdn.tailwindcss.com"></script>
 		<style>
-			*,
-			::before,
-			::after {
-				box-sizing: border-box;
-			}
-
-			body {
-				margin: 50px auto 100px;
-				padding: 0 20px;
-				max-width: 720px;
-				font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-					Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
-			}
-
-			a {
-				color: hsl(250 100% 50%);
-				font-weight: bold;
-			}
-
-			h1 + p {
-				font-size: 1.2em;
-			}
-
-			pre,
-			code,
-			kbd {
-				font-family: SFMono-Regular, Consolas, Liberation Mono, Menlo, monospace;
-			}
-
-			li {
-				margin: 10px 0;
-			}
-
-			kbd {
-				padding: 2px 6px;
-				background: hsl(250 90% 90%);
-				border-radius: 8px;
-			}
-
-			pre {
-				margin: 20px 0;
-				padding: 20px;
-				background: hsl(250 90% 95%);
-				overflow: auto;
-				-webkit-overflow-scrolling: touch;
-				border-radius: 8px;
-			}
-
-			pre strong {
-				color: hsl(250 90% 50%);
-			}
-
-			pre em {
-				color: hsl(250 20% 50%);
-				font-style: normal;
-			}
-
-			#logs {
-				max-height: 400px;
-				overflow: auto;
-			}
-
 			.github-corner {
 				fill: #151513;
 				color: #fff;
@@ -108,95 +47,247 @@
 			}
 		</style>
 	</head>
-	<body>
-		<h1>
-			<code>tinykeys</code>
-		</h1>
-		<p>A tiny (~400 B) & modern library for keybindings.</p>
+	<body class="pb-12">
+		<div class="container mx-auto px-4">
+			<div class="flex flex-col gap-4">
+				<header>
+					<h1 class="text-3xl font-bold font-mono text-indigo-600">tinykeys</h1>
+					<p class="text-xl font-medium text-slate-600">
+						A tiny (~400 B) & modern library for keybindings.
+					</p>
+				</header>
 
-		<a
-			href="https://github.com/jamiebuilds/tinykeys"
-			class="github-corner"
-			aria-label="View source on GitHub"
-		>
-			<svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true">
-				<path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path>
-				<path
-					d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2"
-					fill="currentColor"
-					style="transform-origin: 130px 106px"
-					class="octo-arm"
-				></path>
-				<path
-					d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z"
-					fill="currentColor"
-				></path>
-			</svg>
-		</a>
+				<a
+					href="https://github.com/jamiebuilds/tinykeys"
+					class="github-corner"
+					aria-label="View source on GitHub"
+				>
+					<svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true">
+						<path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path>
+						<path
+							d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2"
+							fill="currentColor"
+							style="transform-origin: 130px 106px"
+							class="octo-arm"
+						></path>
+						<path
+							d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z"
+							fill="currentColor"
+						></path>
+					</svg>
+				</a>
 
-		<pre>npm install tinykeys</pre>
+				<pre
+					class="
+						font-mono
+						text-lg
+						before:content-['$']
+						before:mr-2
+						before:text-indigo-400
+						text-white
+						bg-slate-900
+						rounded-md
+						p-3
+						my-4
+					"
+				>
+npm install tinykeys</pre
+				>
 
-		<h2>Examples</h2>
-		<p>Try one of the following:</p>
-		<ul>
-			<li><kbd>Shift+D</kbd></li>
-			<li><kbd>y e e t</kbd></li>
-			<li>
-				<kbd>Control+D</kbd> (Windows/Linux) or <kbd>Command+D</kbd> (Mac)
-			</li>
-		</ul>
+				<h2 class="font-bold text-2xl">Examples</h2>
+				<p>Try some of the following:</p>
+				<ul class="flex flex-col gap-4 list-disc list-inside pl-3">
+					<li>
+						<kbd
+							class="
+								font-mono
+								text-emerald-700
+								bg-emerald-100
+								rounded
+								py-px
+								px-1
+							"
+							>Shift+D</kbd
+						>
+					</li>
+					<li>
+						<kbd
+							class="
+								font-mono
+								text-emerald-700
+								bg-emerald-100
+								rounded
+								py-px
+								px-1
+							"
+							>y e e t</kbd
+						>
+					</li>
+					<li>
+						<kbd
+							class="
+								font-mono
+								text-emerald-700
+								bg-emerald-100
+								rounded
+								py-px
+								px-1
+							"
+							>Control+D</kbd
+						>
+						(Windows/Linux) or
+						<kbd
+							class="
+								font-mono
+								text-emerald-700
+								bg-emerald-100
+								rounded
+								py-px
+								px-1
+							"
+							>Command+D</kbd
+						>
+						(Mac)
+					</li>
+				</ul>
 
-		<pre>
+				<pre class="font-mono bg-slate-900 rounded-md p-3 text-white">
 import tinykeys from "tinykeys"
 
 tinykeys(window, {
-  <strong>"Shift+D"</strong>: () => {
-    <em>alert("The 'Shift' and 'd' keys were pressed at the same time")</em>
+  <strong class="text-emerald-400">"Shift+D"</strong>: () => {
+    <em class="text-pink-400">alert("The 'Shift' and 'd' keys were pressed at the same time")</em>
   },
-  <strong>"y e e t"</strong>: () => {
-    <em>alert("The keys 'y', 'e', 'e', and 't' were pressed in order")</em>
+  <strong class="text-emerald-400">"y e e t"</strong>: () => {
+    <em class="text-pink-400">alert("The keys 'y', 'e', 'e', and 't' were pressed in order")</em>
   },
-  <strong>"$mod+KeyD"</strong>: () => {
-    <em>alert("Either 'Control+d' or 'Meta+d' were pressed")</em>
+  <strong class="text-emerald-400">"$mod+KeyU"</strong>: () => {
+    <em class="text-pink-400">alert("Either 'Control+u' or 'Meta+u' were pressed")</em>
   },
 })
 </pre>
 
-		<h2>History</h2>
-		<p>
-			Logs
-			<a
-				href="https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/key"
-				><code>KeyboardEvent.key</code></a
-			>
-			and
-			<a
-				href="https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/code/code_values"
-				><code>KeyboardEvent.code</code></a
-			>
-			used by this library
-		</p>
-		<pre id="logs">(start typing)</pre>
+				<h2 class="font-bold text-2xl" id="debugger">Debugger</h2>
+				<p>Typing will log details of the event that was fired</p>
+				<div
+					class="
+						h-[theme(spacing.96)]
+						w-full
+						overflow-auto
+						relative
+						bg-slate-300
+						rounded
+					"
+				>
+					<table class="text-center w-full">
+						<thead>
+							<tr class="sticky top-0">
+								<th class="bg-slate-100 odd:bg-slate-200 p-2">
+									<code class="font-mono text-xs">event.key</code>
+								</th>
+								<th class="bg-slate-100 odd:bg-slate-200 p-2">
+									<code class="font-mono text-xs">event.code</code>
+								</th>
+								<th class="bg-slate-100 odd:bg-slate-200 p-2">
+									<code class="font-mono text-xs"
+										>event.getModifierState(event.key)</code
+									>
+								</th>
+								<th class="bg-slate-100 odd:bg-slate-200 p-2">
+									<code class="font-mono text-xs"
+										>event.getModifierState(...)</code
+									>
+								</th>
+								<th class="bg-slate-100 odd:bg-slate-200 p-2">
+									<code class="font-mono text-xs">event.repeating</code>
+								</th>
+								<th class="bg-slate-100 odd:bg-slate-200 p-2">
+									<code class="font-mono text-xs">event.composing</code>
+								</th>
+								<th class="bg-slate-100 odd:bg-slate-200 p-2">
+									<code class="font-mono text-xs">event.location</code>
+								</th>
+							</tr>
+						</thead>
+						<tbody id="logs"></tbody>
+					</table>
+				</div>
+				<blockquote
+					class="bg-slate-100 border-l-4 rounded p-3 text-slate-700 text-sm"
+				>
+					<p>
+						<strong>Note:</strong>
+						<code>event.getModifierState(event.key)</code> tests if the key
+						pressed is considered a "modifier" key
+					</p>
+				</blockquote>
+			</div>
+		</div>
 		<script src="./index.tsx"></script>
 		<script>
 			let logsElement = document.querySelector("#logs")
-			let logs = []
-
 			window.addEventListener("keydown", event => {
-				logs.unshift({
+				let wellKnownModifiers = [
+					"Alt",
+					"AltGraph",
+					"CapsLock",
+					"Control",
+					"Fn",
+					"FnLock",
+					"Hyper",
+					"Meta",
+					"NumLock",
+					"OS",
+					"ScrollLock",
+					"Shift",
+					"Super",
+					"Symbol",
+					"SymbolLock",
+					// legacy
+					"Accel",
+					"Scroll",
+					"Win",
+				]
+				let newLog = {
 					key: event.key,
 					code: event.code,
-					modifier: event.getModifierState(event.key),
-				})
+					isModifier: event.getModifierState(event.key),
+					activeModifiers: new Set(),
+					repeat: event.repeat,
+					isComposing: event.isComposing,
+					location: event.location,
+				}
 
-				logsElement.innerText = logs
-					.map(log => {
-						return (
-							`key: "${log.key}", code: "${log.code}"` +
-							(log.modifier ? ` (modifier)` : ``)
-						)
-					})
-					.join("\n")
+				for (let modifier of wellKnownModifiers) {
+					if (event.getModifierState(modifier)) {
+						newLog.activeModifiers.add(modifier)
+					}
+				}
+
+				let tr = document.createElement("tr")
+				tr.innerHTML = `
+					<td class="bg-slate-50 odd:bg-slate-100 p-2 text-indigo-700 font-bold"><code>${
+						newLog.key
+					}</code></td>
+					<td class="bg-slate-50 odd:bg-slate-100 p-2 text-indigo-700 font-bold"><code>${
+						newLog.code
+					}</code></td>
+					<td class="bg-slate-50 odd:bg-slate-100 p-2"><code>${
+						newLog.isModifier
+					}</code></td>
+					<td class="bg-slate-50 odd:bg-slate-100 p-2"><code>${
+						Array.from(newLog.activeModifiers).join(", ") || "(none)"
+					}</code></td>
+					<td class="bg-slate-50 odd:bg-slate-100 p-2"><code>${newLog.repeat}</code></td>
+					<td class="bg-slate-50 odd:bg-slate-100 p-2"><code>${
+						newLog.isComposing
+					}</code></td>
+					<td class="bg-slate-50 odd:bg-slate-100 p-2"><code>${
+						newLog.location
+					}</code></td>
+				`
+
+				logsElement.prepend(tr)
 			})
 		</script>
 	</body>
