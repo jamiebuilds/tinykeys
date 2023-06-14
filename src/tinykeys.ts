@@ -47,13 +47,27 @@ let DEFAULT_TIMEOUT = 1000
 let DEFAULT_EVENT = "keydown"
 
 /**
+ * Platform detection code.
+ * @see https://github.com/jamiebuilds/tinykeys/issues/184
+ */
+let PLATFORM = typeof navigator === "object" ? navigator.platform : ""
+let APPLE_DEVICE = /Mac|iPod|iPhone|iPad/.test(PLATFORM)
+
+/**
  * An alias for creating platform-specific keybinding aliases.
  */
-let MOD =
-	typeof navigator === "object" &&
-	/Mac|iPod|iPhone|iPad/.test(navigator.platform)
-		? "Meta"
-		: "Control"
+let MOD = APPLE_DEVICE ? "Meta" : "Control"
+
+/**
+ * Meaning of `AltGraph`, from MDN:
+ * - Windows: Both Alt and Ctrl keys are pressed, or AltGr key is pressed
+ * - Mac: ⌥ Option key pressed
+ * - Linux: Level 3 Shift key (or Level 5 Shift key) pressed
+ * - Android: Not supported
+ * @see https://github.com/jamiebuilds/tinykeys/issues/185
+ */
+let ALT_GRAPH_ALIASES =
+	PLATFORM === "Win32" ? ["Control", "Alt"] : APPLE_DEVICE ? ["Alt"] : []
 
 /**
  * There's a bug in Chrome that causes event.getModifierState not to exist on
@@ -61,7 +75,8 @@ let MOD =
  */
 function getModifierState(event: KeyboardEvent, mod: string) {
 	return typeof event.getModifierState === "function"
-		? event.getModifierState(mod)
+		? event.getModifierState(mod) ||
+				(ALT_GRAPH_ALIASES.includes(mod) && event.getModifierState("AltGraph"))
 		: false
 }
 

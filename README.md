@@ -102,6 +102,37 @@ Something missing? Check out the key logger on the
 > same key on the keyboard. Keep in mind how this is affected by international
 > keyboards which may have different layouts._
 
+## Key aliases
+
+In some instances, tinykeys will alias keys depending on the platform to
+simplify cross-platform keybindings on international keyboards.
+
+### `AltGraph` (modifier)
+
+On Windows, on many non-US standard keyboard layouts, there is a key named
+`Alt Gr` or `AltGraph` in the browser, in some browsers, pressing `Control+Alt`
+will report `AltGraph` as being pressed instead.
+
+Similarly on macOS, the `Alt` (`Option`) key will sometimes be reported as the
+`AltGraph` key.
+
+**Note:** The purpose of the `Alt Gr` key is to type "Alternate Graphics" so you
+will often want to use the `event.code` (`KeyS`) for letters instead of
+`event.key` (`S`)
+
+```js
+tinykeys(window, {
+  "Control+Alt+KeyS": event => {
+    // macOS: `Control+Alt+S` or `Control+AltGraph+S`
+    // Windows: `Control+Alt+S` or `Control+AltGraph+S` or `AltGraph+S`
+  },
+  "$mod+Alt+KeyS": event => {
+    // macOS: `Meta+Alt+S` or `Meta+AltGraph+S`
+    // Windows: `Control+Alt+S` or `Control+AltGraph+S` or `AltGraph+S`
+  },
+})
+```
+
 ## Keybinding Syntax
 
 Keybindings are made up of a **_sequence_** of **_presses_**.
@@ -176,8 +207,9 @@ let parsedShortcut = parseKeybinding("$mod+Shift+K $mod+1")
 
 Results into:
 
+<!-- prettier-ignore -->
 ```js
-;[
+[
   [["Meta", "Shift"], "K"],
   [["Meta"], "1"],
 ]
