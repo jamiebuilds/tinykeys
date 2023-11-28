@@ -14,7 +14,7 @@ Or for a CDN version, you can use it on [unpkg.com](https://unpkg.com/tinykeys)
 ## Usage
 
 ```js
-import tinykeys from "tinykeys" // Or `window.tinykeys` using the CDN version
+import { tinykeys } from "tinykeys" // Or `window.tinykeys` using the CDN version
 
 tinykeys(window, {
   "Shift+D": () => {
@@ -59,7 +59,7 @@ returned `unsubscribe()` function.
 
 ```js
 import { useEffect } from "react"
-import tinykeys from "tinykeys"
+import { tinykeys } from "tinykeys"
 
 function useKeyboardShortcuts() {
   useEffect(() => {
