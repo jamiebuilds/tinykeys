@@ -165,7 +165,27 @@ tinykeys(window, {
     <em class="text-pink-400">alert("Either 'Control+u' or 'Meta+u' were pressed")</em>
   },
 })
-</pre>
+<details><summary class="text-slate-500 bg-slate-800 rounded p-1 my-1">what does this button do</summary>import confetti from "canvas-confetti"
+
+<strong class="text-emerald-400">let KonamiCode = [
+	"ArrowUp",
+	"ArrowUp",
+	"ArrowDown",
+	"ArrowDown",
+	"ArrowLeft",
+	"ArrowRight",
+	"ArrowLeft",
+	"ArrowRight",
+	"KeyB",
+	"KeyA",
+	"Enter",
+].join(" ")</strong>
+
+tinykeys(window, {
+	[<strong class="text-emerald-400">KonamiCode</strong>]: () => {
+		<em class="text-pink-400">confetti()</em>
+	},
+})</details></pre>
 
 				<h2 class="font-bold text-2xl" id="debugger">Debugger</h2>
 				<p>Typing will log details of the event that was fired</p>
