@@ -3,6 +3,8 @@ on:
   push:
     branches:
       - main
+permissions:
+  contents: write
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
@@ -21,8 +23,6 @@ jobs:
       - name: Build
         run: npm run build:example
       - name: Deploy
-        uses: JamesIves/github-pages-deploy-action@releases/v3
+        uses:  JamesIves/github-pages-deploy-action@v4
         with:
-          ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
-          BRANCH: gh-pages
-          FOLDER: example-dist
+          folder: example-dist
