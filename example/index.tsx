@@ -8,8 +8,9 @@ tinykeys(window, {
 	"y e e t": () => {
 		alert("The keys 'y', 'e', 'e', and 't' were pressed in order")
 	},
-	"$mod+KeyU": () => {
-		alert("Either 'Control+u' or 'Meta+u' were pressed")
+	"$mod+([1-9])": event => {
+		event.preventDefault()
+		alert(`Either 'Control+${event.key}' or 'Meta+${event.key}' were pressed`)
 	},
 })
 
@@ -29,7 +30,7 @@ const KonamiCode = [
 
 tinykeys(window, {
 	[KonamiCode]: () => {
-		const duration = 15 * 1000
+		const duration = 5 * 1000
 		const animationEnd = Date.now() + duration
 		const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 }
 

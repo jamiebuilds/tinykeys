@@ -1,6 +1,6 @@
 # `tinykeys`
 
-> A tiny (~400 B) & modern library for keybindings.
+> A tiny (~650 B) & modern library for keybindings.
 > [See Demo](https://jamiebuilds.github.io/tinykeys/)
 
 ## Install
@@ -23,9 +23,9 @@ tinykeys(window, {
   "y e e t": () => {
     alert("The keys 'y', 'e', 'e', and 't' were pressed in order")
   },
-  "$mod+KeyD": event => {
+  "$mod+([0-9])": event => {
     event.preventDefault()
-    alert("Either 'Control+d' or 'Meta+d' were pressed")
+    alert(`Either 'Control+${event.key}' or 'Meta+${event.key}' were pressed`)
   },
 })
 ```
@@ -173,6 +173,14 @@ platform keybindings:
 "$mod+Shift+D" // Meta/Control+Shift+D
 ```
 
+Alternatively, you can use parenthesis to use case-sensitive regular expressions
+to match multiple keys.
+
+```js
+"$mod+([0-9])" // $mod+0, $mod+1, $mod+2, etc...
+// equivalent regex: /^[0-9]$/
+```
+
 ### Keybinding Sequences
 
 Keybindings can also consist of several key presses in a row:
@@ -221,13 +229,14 @@ You can configure the behavior of tinykeys in a couple ways using a third
 `options` parameter.
 
 ```js
-tinykey(
+tinykeys(
   window,
   {
     M: toggleMute,
   },
   {
     event: "keyup",
+    capture: true,
   },
 )
 ```

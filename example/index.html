@@ -155,15 +155,16 @@ npm install tinykeys</pre
 import tinykeys from "tinykeys"
 
 tinykeys(window, {
-  <strong class="text-emerald-400">"Shift+D"</strong>: () => {
-    <em class="text-pink-400">alert("The 'Shift' and 'd' keys were pressed at the same time")</em>
-  },
-  <strong class="text-emerald-400">"y e e t"</strong>: () => {
-    <em class="text-pink-400">alert("The keys 'y', 'e', 'e', and 't' were pressed in order")</em>
-  },
-  <strong class="text-emerald-400">"$mod+KeyU"</strong>: () => {
-    <em class="text-pink-400">alert("Either 'Control+u' or 'Meta+u' were pressed")</em>
-  },
+	<strong class="text-emerald-400">"Shift+D"</strong>: () => {
+		<em class="text-pink-400">alert("The 'Shift' and 'd' keys were pressed at the same time")</em>
+	},
+	<strong class="text-emerald-400">"y e e t"</strong>: () => {
+		<em class="text-pink-400">alert("The keys 'y', 'e', 'e', and 't' were pressed in order")</em>
+	},
+	<strong class="text-emerald-400">"$mod+([1-9])"</strong>: event => {
+		event.preventDefault()
+		<em class="text-pink-400">alert(`Either 'Control+${event.key}' or 'Meta+${event.key}' were pressed`)</em>
+	},
 })
 <details><summary class="text-slate-500 bg-slate-800 rounded p-1 my-1">what does this button do</summary>import confetti from "canvas-confetti"
 

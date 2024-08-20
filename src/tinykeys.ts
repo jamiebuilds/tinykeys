@@ -1,4 +1,7 @@
-type KeyBindingPress = [string[], string]
+/**
+ * A single press of a keybinding sequence
+ */
+export type KeyBindingPress = [mods: string[], key: string | RegExp]
 
 /**
  * A map of keybinding strings to event handlers.
@@ -26,6 +29,11 @@ export interface KeyBindingOptions extends KeyBindingHandlerOptions {
 	 * Key presses will listen to this event (default: "keydown").
 	 */
 	event?: "keydown" | "keyup"
+
+	/**
+	 * Key presses will use a capture listener (default: false)
+	 */
+	capture?: boolean
 }
 
 /**
@@ -44,7 +52,7 @@ let DEFAULT_TIMEOUT = 1000
 /**
  * Keybinding sequences should bind to this event by default.
  */
-let DEFAULT_EVENT = "keydown"
+let DEFAULT_EVENT = "keydown" as const
 
 /**
  * Platform detection code.
@@ -87,6 +95,8 @@ function getModifierState(event: KeyboardEvent, mod: string) {
  * <sequence> = `<press> <press> <press> ...`
  * <press>    = `<key>` or `<mods>+<key>`
  * <mods>     = `<mod>+<mod>+...`
+ * <key>      = `<KeyboardEvent.key>` or `<KeyboardEvent.code>` (case-insensitive)
+ * <key>      = `(<regex>)` -> `/^<regex>$/` (case-sensitive)
  */
 export function parseKeybinding(str: string): KeyBindingPress[] {
 	return str
@@ -94,29 +104,36 @@ export function parseKeybinding(str: string): KeyBindingPress[] {
 		.split(" ")
 		.map(press => {
 			let mods = press.split(/\b\+/)
-			let key = mods.pop() as string
+			let key: string | RegExp = mods.pop() as string
+			let match = key.match(/^\((.+)\)$/)
+			if (match) {
+				key = new RegExp(`^${match[1]}$`)
+			}
 			mods = mods.map(mod => (mod === "$mod" ? MOD : mod))
 			return [mods, key]
 		})
 }
 
 /**
- * This tells us if a series of events matches a key binding sequence either
- * partially or exactly.
+ * This tells us if a single keyboard event matches a single keybinding press.
  */
-function match(event: KeyboardEvent, press: KeyBindingPress): boolean {
+export function matchKeyBindingPress(
+	event: KeyboardEvent,
+	[mods, key]: KeyBindingPress,
+): boolean {
 	// prettier-ignore
 	return !(
 		// Allow either the `event.key` or the `event.code`
 		// MDN event.key: https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/key
 		// MDN event.code: https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/code
 		(
-			press[1].toUpperCase() !== event.key.toUpperCase() &&
-			press[1] !== event.code
+			key instanceof RegExp ? !(key.test(event.key) || key.test(event.code)) :
+			(key.toUpperCase() !== event.key.toUpperCase() &&
+			key !== event.code)
 		) ||
 
 		// Ensure all the modifiers in the keybinding are pressed.
-		press[0].find(mod => {
+		mods.find(mod => {
 			return !getModifierState(event, mod)
 		}) ||
 
@@ -124,7 +141,7 @@ function match(event: KeyboardEvent, press: KeyBindingPress): boolean {
 		// keybinding. So if they are pressed but aren't part of the current
 		// keybinding press, then we don't have a match.
 		KEYBINDING_MODIFIER_KEYS.find(mod => {
-			return !press[0].includes(mod) && press[1] !== mod && getModifierState(event, mod)
+			return !mods.includes(mod) && key !== mod && getModifierState(event, mod)
 		})
 	)
 }
@@ -180,7 +197,7 @@ export function createKeybindingsHandler(
 			let remainingExpectedPresses = prev ? prev : sequence
 			let currentExpectedPress = remainingExpectedPresses[0]
 
-			let matches = match(event, currentExpectedPress)
+			let matches = matchKeyBindingPress(event, currentExpectedPress)
 
 			if (!matches) {
 				// Modifier keydown events shouldn't break sequences
@@ -232,14 +249,11 @@ export function createKeybindingsHandler(
 export function tinykeys(
 	target: Window | HTMLElement,
 	keyBindingMap: KeyBindingMap,
-	options: KeyBindingOptions = {},
+	{ event = DEFAULT_EVENT, capture, timeout }: KeyBindingOptions = {},
 ): () => void {
-	let event = options.event ?? DEFAULT_EVENT
-	let onKeyEvent = createKeybindingsHandler(keyBindingMap, options)
-
-	target.addEventListener(event, onKeyEvent)
-
+	let onKeyEvent = createKeybindingsHandler(keyBindingMap, { timeout })
+	target.addEventListener(event, onKeyEvent, capture)
 	return () => {
-		target.removeEventListener(event, onKeyEvent)
+		target.removeEventListener(event, onKeyEvent, capture)
 	}
 }
