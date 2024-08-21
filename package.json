@@ -16,6 +16,7 @@
   "exports": {
     ".": {
       "import": "./dist/tinykeys.module.js",
+      "types": "dist/tinykeys.d.ts",
       "require": "./dist/tinykeys.js"
     }
   },
