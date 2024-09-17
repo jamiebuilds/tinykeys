@@ -127,7 +127,7 @@ export function matchKeyBindingPress(
 		// MDN event.key: https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/key
 		// MDN event.code: https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/code
 		(
-			key instanceof RegExp ? !(key.test(event.key) || key.test(event.code)) :
+			key instanceof RegExp ? !(key.test(event.key) || key.test(event.code.replace(/^(Key|Digit)/, ''))) :
 			(key.toUpperCase() !== event.key.toUpperCase() &&
 			key !== event.code)
 		) ||
