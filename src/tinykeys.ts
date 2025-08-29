@@ -7,7 +7,7 @@ export type KeyBindingPress = [mods: string[], key: string | RegExp]
  * A map of keybinding strings to event handlers.
  */
 export interface KeyBindingMap {
-	[keybinding: string]: (event: KeyboardEvent) => void
+	[keybinding: string]: (event: KeyboardEvent, ...args: any[]) => void
 }
 
 export interface KeyBindingHandlerOptions {
@@ -181,7 +181,7 @@ export function createKeybindingsHandler(
 	let possibleMatches = new Map<KeyBindingPress[], KeyBindingPress[]>()
 	let timer: number | null = null
 
-	return event => {
+	return (event, ...args: any[]) => {
 		// Ensure and stop any event that isn't a full keyboard event.
 		// Autocomplete option navigation and selection would fire a instanceof Event,
 		// instead of the expected KeyboardEvent
@@ -212,7 +212,7 @@ export function createKeybindingsHandler(
 				possibleMatches.set(sequence, remainingExpectedPresses.slice(1))
 			} else {
 				possibleMatches.delete(sequence)
-				callback(event)
+				callback(event, ...args)
 			}
 		})
 
