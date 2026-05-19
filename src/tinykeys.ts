@@ -96,7 +96,7 @@ function getModifierState(event: KeyboardEvent, mod: string) {
  * <press>    = `<key>` or `<mods>+<key>`
  * <mods>     = `<mod>+<mod>+...`
  * <key>      = `<KeyboardEvent.key>` or `<KeyboardEvent.code>` (case-insensitive)
- * <key>      = `(<regex>)` -> `/^<regex>$/` (case-sensitive)
+ * <key>      = `(<regex>)` -> `/^(?:<regex>)$/` (case-sensitive)
  */
 export function parseKeybinding(str: string): KeyBindingPress[] {
 	return str
@@ -107,7 +107,7 @@ export function parseKeybinding(str: string): KeyBindingPress[] {
 			let key: string | RegExp = mods.pop() as string
 			let match = key.match(/^\((.+)\)$/)
 			if (match) {
-				key = new RegExp(`^${match[1]}$`)
+				key = new RegExp(`^(?:${match[1]})$`, "iv")
 			}
 			mods = mods.map(mod => (mod === "$mod" ? MOD : mod))
 			return [mods, key]

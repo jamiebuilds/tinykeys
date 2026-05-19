@@ -178,7 +178,7 @@ to match multiple keys.
 
 ```js
 "$mod+([0-9])" // $mod+0, $mod+1, $mod+2, etc...
-// equivalent regex: /^[0-9]$/
+// equivalent regex: /^(?:[0-9])$/iv
 ```
 
 ### Keybinding Sequences
