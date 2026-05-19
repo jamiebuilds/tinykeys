@@ -15,6 +15,7 @@
   ],
   "exports": {
     ".": {
+      "types": "./dist/tinykeys.d.ts",
       "import": "./dist/tinykeys.module.js",
       "require": "./dist/tinykeys.js"
     }
@@ -39,12 +40,12 @@
     "shortcuts"
   ],
   "scripts": {
-    "check": "npm run -s typecheck && npm run -s lint && npm run -s check:format",
-    "typecheck": "tsc --noEmit",
-    "test": "TS_NODE_PROJECT=./tsconfig.test.json nyc --reporter=lcov --reporter=text-summary ava",
-    "lint": "eslint '**'",
     "format": "prettier --write '**'",
+    "check": "npm run -s check:types && npm run -s lint && npm run -s check:format",
+    "check:types": "tsc --noEmit",
+    "check:lint": "eslint '**'",
     "check:format": "prettier --check '**'",
+    "test": "TS_NODE_PROJECT=./tsconfig.test.json nyc --reporter=lcov --reporter=text-summary ava",
     "build": "rm -rf dist && microbundle --inline none",
     "build:example": "rm -rf example-dist && parcel build example/index.html -d example-dist --public-url ./",
     "start": "rm -rf example-dist && parcel example/index.html -d example-dist",
