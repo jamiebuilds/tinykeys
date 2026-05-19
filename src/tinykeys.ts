@@ -10,6 +10,8 @@ export interface KeyBindingMap {
 	[keybinding: string]: (event: KeyboardEvent) => void
 }
 
+export type KeyBindingFilter = (event: KeyboardEvent) => boolean;
+
 export interface KeyBindingHandlerOptions {
 	/**
 	 * Keybinding sequences will wait this long between key presses before
@@ -19,6 +21,33 @@ export interface KeyBindingHandlerOptions {
 	 * of your users.
 	 */
 	timeout?: number
+
+	/**
+	 * Customize the behavior of which keyboard events will be ignored/skipped.
+	 *
+	 * By default this uses the behavior of {@link defaultKeybindingsHandlerIgnore}.
+	 *
+	 * @example Allow all events
+	 * ```tsx
+	 * tinykeys(window, {...}, {
+	 *   ignore: () => false
+	 * })
+	 * ```
+	 *
+	 * @example Extend the default ignore
+	 * ```tsx
+	 * tinykeys(window, {...}, {
+	 *   ignore: event => {
+	 *     return (
+	 *       // Also ignore events inside a dialog
+	 *       event.target.closest("dialog") != null &&
+	 *       defaultKeybindingsHandlerIgnore(event)
+	 *     );
+	 *   }
+	 * })
+	 * ```
+	 */
+	ignore?: KeyBindingFilter;
 }
 
 /**
@@ -77,8 +106,27 @@ let MOD = APPLE_DEVICE ? "Meta" : "Control"
 let ALT_GRAPH_ALIASES =
 	PLATFORM === "Win32" ? ["Control", "Alt"] : APPLE_DEVICE ? ["Alt"] : []
 
+/**
+ * Ensure and stop any event that isn't a full keyboard event.
+ * Autocomplete option navigation and selection would fire an Event,
+ * instead of the expected KeyboardEvent
+ */
 function isKeyboardEvent(event: Partial<KeyboardEvent>): event is KeyboardEvent {
 	return !!(event.key && event.code && event.getModifierState);
+}
+
+/**
+ * Ignores keyboard events from contenteditable and form elements unless they
+ * are the current target.
+ */
+export function defaultKeybindingsHandlerIgnore(event: KeyboardEvent) {
+	const target = event.target as HTMLElement;
+	return !(
+		// Always allow the current target
+		target == event.currentTarget ||
+		// Ignore contenteditable and form elements
+		target.matches('[contenteditable],input,select,textarea')
+	);
 }
 
 /**
@@ -177,6 +225,7 @@ export function createKeybindingsHandler(
 	options: KeyBindingHandlerOptions = {},
 ): EventListener {
 	let timeout = options.timeout ?? DEFAULT_TIMEOUT
+	let ignore = options.ignore ?? defaultKeybindingsHandlerIgnore;
 
 	let keyBindings = Object.keys(keyBindingMap).map(key => {
 		return [parseKeybinding(key), keyBindingMap[key]] as const
@@ -186,10 +235,7 @@ export function createKeybindingsHandler(
 	let timer: number | null = null
 
 	return event => {
-		// Ensure and stop any event that isn't a full keyboard event.
-		// Autocomplete option navigation and selection would fire an Event,
-		// instead of the expected KeyboardEvent
-		if (!isKeyboardEvent(event)) {
+		if (!isKeyboardEvent(event) || ignore(event)) {
 			return
 		}
 
@@ -253,11 +299,12 @@ export function createKeybindingsHandler(
 export function tinykeys(
 	target: Window | HTMLElement,
 	keyBindingMap: KeyBindingMap,
-	{ event = DEFAULT_EVENT, capture, timeout }: KeyBindingOptions = {},
+	options: KeyBindingOptions = {},
 ): () => void {
-	let onKeyEvent = createKeybindingsHandler(keyBindingMap, { timeout })
-	target.addEventListener(event, onKeyEvent, capture)
+	let event = options.event ?? DEFAULT_EVENT;
+	let onKeyEvent = createKeybindingsHandler(keyBindingMap, options)
+	target.addEventListener(event, onKeyEvent, options.capture)
 	return () => {
-		target.removeEventListener(event, onKeyEvent, capture)
+		target.removeEventListener(event, onKeyEvent, options.capture)
 	}
 }

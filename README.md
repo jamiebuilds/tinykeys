@@ -256,3 +256,10 @@ Keybinding sequences will wait this long between key presses before cancelling
 
 > **Note:** Setting this value too low (i.e. `300`) will be too fast for many of
 > your users.
+
+### `options.ignore`
+
+Add a filter for which keyboard events should be ignored.
+
+By default, tinykeys will ignore keyboard events from `[contenteditable]`,
+`input`, `textarea`, and `select` unless they are the `event.currentTarget`.
