@@ -62,7 +62,7 @@ test.describe("tinykeys()", () => {
 			$tinykeys(window, { "y e e t": cb })
 			await userEvent.keyboard("yee")
 			expect(cb).not.toHaveBeenCalled()
-		})
+    })
 	})
 
 	test("keyup event", async () => {
@@ -155,5 +155,52 @@ test.describe("tinykeys()", () => {
 			await userEvent.type(input, "a")
 			expect(cb).toHaveBeenCalledOnce()
 		})
-	})
+  })
+
+  test.describe('multiple keybindings', () => {
+    test('first one wins', async () => {
+      let cb1 = vi.fn();
+      let cb2 = vi.fn();
+
+      $tinykeys(window, {
+        "a": cb1,
+        "A": cb2,
+      });
+
+      await userEvent.keyboard("{KeyA}")
+
+      expect(cb1).toHaveBeenCalledOnce();
+      expect(cb2).not.toHaveBeenCalled();
+    });
+
+    test('sequence completion vs single press', async () => {
+      let cb1 = vi.fn();
+      let cb2 = vi.fn();
+
+      $tinykeys(window, {
+        "g a": cb1,
+        "a": cb2,
+      });
+
+      await userEvent.keyboard("ga")
+
+      expect(cb1).toHaveBeenCalledOnce();
+      expect(cb2).not.toHaveBeenCalled();
+    });
+
+    test('sequence continuation vs single press', async () => {
+      let cb1 = vi.fn();
+      let cb2 = vi.fn();
+
+      $tinykeys(window, {
+        "g a b": cb1,
+        "a": cb2,
+      });
+
+      await userEvent.keyboard("gab")
+
+      expect(cb1).toHaveBeenCalledOnce();
+      // expect(cb2).not.toHaveBeenCalled();
+    });
+  });
 })

@@ -2,3 +2,5 @@ node_modules
 *.log
 dist
 example/dist
+.vitest-attachments
+__screenshots__

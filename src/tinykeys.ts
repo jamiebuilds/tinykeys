@@ -243,10 +243,7 @@ export function createKeybindingsHandler(
 			return
 		}
 
-		keybindings.forEach(keybinding => {
-			let sequence = keybinding[0]
-			let callback = keybinding[1]
-
+		for (const [sequence, callback] of keybindings) {
 			let prev = possibleMatches.get(sequence)
 			let remainingExpectedPresses = prev ? prev : sequence
 			let currentExpectedPress = remainingExpectedPresses[0]
@@ -265,10 +262,11 @@ export function createKeybindingsHandler(
 			} else if (remainingExpectedPresses.length > 1) {
 				possibleMatches.set(sequence, remainingExpectedPresses.slice(1))
 			} else {
-				possibleMatches.delete(sequence)
+				possibleMatches.delete(sequence);
 				callback(event)
+				break;
 			}
-		})
+		}
 
 		if (timer) {
 			clearTimeout(timer)
