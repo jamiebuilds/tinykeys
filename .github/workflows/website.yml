@@ -3,26 +3,28 @@ on:
   push:
     branches:
       - main
-permissions:
-  contents: write
 jobs:
-  build-and-deploy:
+  build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
         with:
-          persist-credentials: false
-      - uses: actions/cache@v1
+          node-version-file: .nvmrc
+      - run: npm install
+      - run: npm run build:example
+      - uses: actions/upload-pages-artifact@v5
         with:
-          path: ~/.npm
-          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-
-      - name: Install
-        run: npm install
-      - name: Build
-        run: npm run build:example
-      - name: Deploy
-        uses:  JamesIves/github-pages-deploy-action@v4
-        with:
-          folder: example-dist
+          path: example/dist/
+  deploy:
+    needs: build
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v5

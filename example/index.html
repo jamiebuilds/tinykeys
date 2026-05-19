@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 	<head>
 		<meta charset="UTF-8" />
@@ -51,7 +51,7 @@
 		<div class="container mx-auto px-4">
 			<div class="flex flex-col gap-4">
 				<header>
-					<h1 class="text-3xl font-bold font-mono text-indigo-600">tinykeys</h1>
+					<h1 class="font-mono text-3xl font-bold text-indigo-600">tinykeys</h1>
 					<p class="text-xl font-medium text-slate-600">
 						A tiny (~400 B) & modern library for keybindings.
 					</p>
@@ -78,80 +78,41 @@
 				</a>
 
 				<pre
-					class="
-						font-mono
-						text-lg
-						before:content-['$']
-						before:mr-2
-						before:text-indigo-400
-						text-white
-						bg-slate-900
-						rounded-md
-						p-3
-						my-4
-					"
+					class="my-4 rounded-md bg-slate-900 p-3 font-mono text-lg text-white before:mr-2 before:text-indigo-400 before:content-['$']"
 				>
 npm install tinykeys</pre
 				>
 
-				<h2 class="font-bold text-2xl">Examples</h2>
+				<h2 class="text-2xl font-bold">Examples</h2>
 				<p>Try some of the following:</p>
-				<ul class="flex flex-col gap-4 list-disc list-inside pl-3">
+				<ul class="flex list-inside list-disc flex-col gap-4 pl-3">
 					<li>
 						<kbd
-							class="
-								font-mono
-								text-emerald-700
-								bg-emerald-100
-								rounded
-								py-px
-								px-1
-							"
+							class="rounded bg-emerald-100 px-1 py-px font-mono text-emerald-700"
 							>Shift+D</kbd
 						>
 					</li>
 					<li>
 						<kbd
-							class="
-								font-mono
-								text-emerald-700
-								bg-emerald-100
-								rounded
-								py-px
-								px-1
-							"
+							class="rounded bg-emerald-100 px-1 py-px font-mono text-emerald-700"
 							>y e e t</kbd
 						>
 					</li>
 					<li>
 						<kbd
-							class="
-								font-mono
-								text-emerald-700
-								bg-emerald-100
-								rounded
-								py-px
-								px-1
-							"
+							class="rounded bg-emerald-100 px-1 py-px font-mono text-emerald-700"
 							>Control+D</kbd
 						>
 						(Windows/Linux) or
 						<kbd
-							class="
-								font-mono
-								text-emerald-700
-								bg-emerald-100
-								rounded
-								py-px
-								px-1
-							"
+							class="rounded bg-emerald-100 px-1 py-px font-mono text-emerald-700"
 							>Command+D</kbd
 						>
 						(Mac)
 					</li>
 				</ul>
 
-				<pre class="font-mono bg-slate-900 rounded-md p-3 text-white">
+				<pre class="rounded-md bg-slate-900 p-3 font-mono text-white">
 import tinykeys from "tinykeys"
 
 tinykeys(window, {
@@ -188,44 +149,37 @@ tinykeys(window, {
 	},
 })</details></pre>
 
-				<h2 class="font-bold text-2xl" id="debugger">Debugger</h2>
+				<h2 class="text-2xl font-bold" id="debugger">Debugger</h2>
 				<p>Typing will log details of the event that was fired</p>
 				<div
-					class="
-						h-[theme(spacing.96)]
-						w-full
-						overflow-auto
-						relative
-						bg-slate-300
-						rounded
-					"
+					class="relative h-[theme(spacing.96)] w-full overflow-auto rounded bg-slate-300"
 				>
-					<table class="text-center w-full">
+					<table class="w-full text-center">
 						<thead>
 							<tr class="sticky top-0">
-								<th class="bg-slate-100 odd:bg-slate-200 p-2">
+								<th class="bg-slate-100 p-2 odd:bg-slate-200">
 									<code class="font-mono text-xs">event.key</code>
 								</th>
-								<th class="bg-slate-100 odd:bg-slate-200 p-2">
+								<th class="bg-slate-100 p-2 odd:bg-slate-200">
 									<code class="font-mono text-xs">event.code</code>
 								</th>
-								<th class="bg-slate-100 odd:bg-slate-200 p-2">
+								<th class="bg-slate-100 p-2 odd:bg-slate-200">
 									<code class="font-mono text-xs"
 										>event.getModifierState(event.key)</code
 									>
 								</th>
-								<th class="bg-slate-100 odd:bg-slate-200 p-2">
+								<th class="bg-slate-100 p-2 odd:bg-slate-200">
 									<code class="font-mono text-xs"
 										>event.getModifierState(...)</code
 									>
 								</th>
-								<th class="bg-slate-100 odd:bg-slate-200 p-2">
+								<th class="bg-slate-100 p-2 odd:bg-slate-200">
 									<code class="font-mono text-xs">event.repeating</code>
 								</th>
-								<th class="bg-slate-100 odd:bg-slate-200 p-2">
+								<th class="bg-slate-100 p-2 odd:bg-slate-200">
 									<code class="font-mono text-xs">event.composing</code>
 								</th>
-								<th class="bg-slate-100 odd:bg-slate-200 p-2">
+								<th class="bg-slate-100 p-2 odd:bg-slate-200">
 									<code class="font-mono text-xs">event.location</code>
 								</th>
 							</tr>
@@ -234,7 +188,7 @@ tinykeys(window, {
 					</table>
 				</div>
 				<blockquote
-					class="bg-slate-100 border-l-4 rounded p-3 text-slate-700 text-sm"
+					class="rounded border-l-4 bg-slate-100 p-3 text-sm text-slate-700"
 				>
 					<p>
 						<strong>Note:</strong>
@@ -244,7 +198,7 @@ tinykeys(window, {
 				</blockquote>
 			</div>
 		</div>
-		<script src="./index.tsx"></script>
+		<script type="module" src="./index.tsx"></script>
 		<script>
 			let logsElement = document.querySelector("#logs")
 			window.addEventListener("keydown", event => {

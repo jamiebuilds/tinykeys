@@ -6,8 +6,7 @@
 	"plugins": ["@typescript-eslint"],
 	"extends": [
 		"plugin:@typescript-eslint/eslint-recommended",
-		"plugin:@typescript-eslint/recommended",
-		"plugin:ava/recommended"
+		"plugin:@typescript-eslint/recommended"
 	],
 	"rules": {
 		"prefer-const": "off",
