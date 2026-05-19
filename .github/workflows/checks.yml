@@ -1,7 +1,7 @@
 name: checks
 on: [push]
 jobs:
-  typecheck:
+  checks:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
