@@ -77,6 +77,10 @@ let MOD = APPLE_DEVICE ? "Meta" : "Control"
 let ALT_GRAPH_ALIASES =
 	PLATFORM === "Win32" ? ["Control", "Alt"] : APPLE_DEVICE ? ["Alt"] : []
 
+function isKeyboardEvent(event: Partial<KeyboardEvent>): event is KeyboardEvent {
+	return !!(event.key && event.code && event.getModifierState);
+}
+
 /**
  * There's a bug in Chrome that causes event.getModifierState not to exist on
  * KeyboardEvent's for F1/F2/etc keys.
@@ -165,7 +169,7 @@ export function matchKeyBindingPress(
  * 	},
  * })
  *
- * window.addEvenListener("keydown", handler)
+ * window.addEventListener("keydown", handler)
  * ```
  */
 export function createKeybindingsHandler(
@@ -183,9 +187,9 @@ export function createKeybindingsHandler(
 
 	return event => {
 		// Ensure and stop any event that isn't a full keyboard event.
-		// Autocomplete option navigation and selection would fire a instanceof Event,
+		// Autocomplete option navigation and selection would fire an Event,
 		// instead of the expected KeyboardEvent
-		if (!(event instanceof KeyboardEvent)) {
+		if (!isKeyboardEvent(event)) {
 			return
 		}
 
