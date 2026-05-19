@@ -6,11 +6,11 @@ export type KeybindingPress = [mods: string[], key: string | RegExp]
 /**
  * A map of keybinding strings to event handlers.
  */
-export interface KeybindingMap {
+export interface KeybindingsMap {
 	[keybinding: string]: (event: KeyboardEvent) => void
 }
 
-export type KeybindingFilter = (event: KeyboardEvent) => boolean;
+export type KeybindingFilter = (event: KeyboardEvent) => boolean
 
 export interface KeybindingHandlerOptions {
 	/**
@@ -47,7 +47,7 @@ export interface KeybindingHandlerOptions {
 	 * })
 	 * ```
 	 */
-	ignore?: KeybindingFilter;
+	ignore?: KeybindingFilter
 }
 
 /**
@@ -111,8 +111,10 @@ let ALT_GRAPH_ALIASES =
  * Autocomplete option navigation and selection would fire an Event,
  * instead of the expected KeyboardEvent
  */
-function isKeyboardEvent(event: Partial<KeyboardEvent>): event is KeyboardEvent {
-	return !!(event.key && event.code && event.getModifierState);
+function isKeyboardEvent(
+	event: Partial<KeyboardEvent>,
+): event is KeyboardEvent {
+	return !!(event.key && event.code && event.getModifierState)
 }
 
 /**
@@ -120,13 +122,13 @@ function isKeyboardEvent(event: Partial<KeyboardEvent>): event is KeyboardEvent 
  * are the current target.
  */
 export function defaultKeybindingsHandlerIgnore(event: KeyboardEvent) {
-	const target = event.target as HTMLElement;
-	return !(
+	let target = event.target as HTMLElement
+	return (
 		// Always allow the current target
-		target == event.currentTarget ||
+		target !== event.currentTarget &&
 		// Ignore contenteditable and form elements
-		target.matches('[contenteditable],input,select,textarea')
-	);
+		target.matches("[contenteditable],input,select,textarea")
+	)
 }
 
 /**
@@ -223,11 +225,11 @@ export function matchKeybindingPress(
  * ```
  */
 export function createKeybindingsHandler(
-	keybindingsMap: KeybindingMap,
+	keybindingsMap: KeybindingsMap,
 	options: KeybindingHandlerOptions = {},
 ): EventListener {
 	let timeout = options.timeout ?? DEFAULT_TIMEOUT
-	let ignore = options.ignore ?? defaultKeybindingsHandlerIgnore;
+	let ignore = options.ignore ?? defaultKeybindingsHandlerIgnore
 
 	let keybindings = Object.keys(keybindingsMap).map(key => {
 		return [parseKeybinding(key), keybindingsMap[key]] as const
@@ -300,10 +302,10 @@ export function createKeybindingsHandler(
  */
 export function tinykeys(
 	target: Window | HTMLElement,
-	keybindingMap: KeybindingMap,
+	keybindingMap: KeybindingsMap,
 	options: KeybindingOptions = {},
 ): () => void {
-	let event = options.event ?? DEFAULT_EVENT;
+	let event = options.event ?? DEFAULT_EVENT
 	let onKeyEvent = createKeybindingsHandler(keybindingMap, options)
 	target.addEventListener(event, onKeyEvent, options.capture)
 	return () => {
