@@ -1,18 +1,18 @@
 /**
  * A single press of a keybinding sequence
  */
-export type KeyBindingPress = [mods: string[], key: string | RegExp]
+export type KeybindingPress = [mods: string[], key: string | RegExp]
 
 /**
  * A map of keybinding strings to event handlers.
  */
-export interface KeyBindingMap {
+export interface KeybindingMap {
 	[keybinding: string]: (event: KeyboardEvent) => void
 }
 
-export type KeyBindingFilter = (event: KeyboardEvent) => boolean;
+export type KeybindingFilter = (event: KeyboardEvent) => boolean;
 
-export interface KeyBindingHandlerOptions {
+export interface KeybindingHandlerOptions {
 	/**
 	 * Keybinding sequences will wait this long between key presses before
 	 * cancelling (default: 1000).
@@ -47,13 +47,13 @@ export interface KeyBindingHandlerOptions {
 	 * })
 	 * ```
 	 */
-	ignore?: KeyBindingFilter;
+	ignore?: KeybindingFilter;
 }
 
 /**
  * Options to configure the behavior of keybindings.
  */
-export interface KeyBindingOptions extends KeyBindingHandlerOptions {
+export interface KeybindingOptions extends KeybindingHandlerOptions {
 	/**
 	 * Key presses will listen to this event (default: "keydown").
 	 */
@@ -141,16 +141,18 @@ function getModifierState(event: KeyboardEvent, mod: string) {
 }
 
 /**
- * Parses a "Key Binding String" into its parts
+ * Parses a keybinding string into its parts.
  *
+ * ```
  * grammar    = `<sequence>`
  * <sequence> = `<press> <press> <press> ...`
  * <press>    = `<key>` or `<mods>+<key>`
  * <mods>     = `<mod>+<mod>+...`
  * <key>      = `<KeyboardEvent.key>` or `<KeyboardEvent.code>` (case-insensitive)
- * <key>      = `(<regex>)` -> `/^(?:<regex>)$/` (case-sensitive)
+ * <key>      = `(<regex>)` -> `/^(?:<regex>)$/iy` (case-insensitive)
+ * ```
  */
-export function parseKeybinding(str: string): KeyBindingPress[] {
+export function parseKeybinding(str: string): KeybindingPress[] {
 	return str
 		.trim()
 		.split(" ")
@@ -169,9 +171,9 @@ export function parseKeybinding(str: string): KeyBindingPress[] {
 /**
  * This tells us if a single keyboard event matches a single keybinding press.
  */
-export function matchKeyBindingPress(
+export function matchKeybindingPress(
 	event: KeyboardEvent,
-	[mods, key]: KeyBindingPress,
+	[mods, key]: KeybindingPress,
 ): boolean {
 	// prettier-ignore
 	return !(
@@ -221,17 +223,17 @@ export function matchKeyBindingPress(
  * ```
  */
 export function createKeybindingsHandler(
-	keyBindingMap: KeyBindingMap,
-	options: KeyBindingHandlerOptions = {},
+	keybindingsMap: KeybindingMap,
+	options: KeybindingHandlerOptions = {},
 ): EventListener {
 	let timeout = options.timeout ?? DEFAULT_TIMEOUT
 	let ignore = options.ignore ?? defaultKeybindingsHandlerIgnore;
 
-	let keyBindings = Object.keys(keyBindingMap).map(key => {
-		return [parseKeybinding(key), keyBindingMap[key]] as const
+	let keybindings = Object.keys(keybindingsMap).map(key => {
+		return [parseKeybinding(key), keybindingsMap[key]] as const
 	})
 
-	let possibleMatches = new Map<KeyBindingPress[], KeyBindingPress[]>()
+	let possibleMatches = new Map<KeybindingPress[], KeybindingPress[]>()
 	let timer: number | null = null
 
 	return event => {
@@ -239,15 +241,15 @@ export function createKeybindingsHandler(
 			return
 		}
 
-		keyBindings.forEach(keyBinding => {
-			let sequence = keyBinding[0]
-			let callback = keyBinding[1]
+		keybindings.forEach(keybinding => {
+			let sequence = keybinding[0]
+			let callback = keybinding[1]
 
 			let prev = possibleMatches.get(sequence)
 			let remainingExpectedPresses = prev ? prev : sequence
 			let currentExpectedPress = remainingExpectedPresses[0]
 
-			let matches = matchKeyBindingPress(event, currentExpectedPress)
+			let matches = matchKeybindingPress(event, currentExpectedPress)
 
 			if (!matches) {
 				// Modifier keydown events shouldn't break sequences
@@ -298,11 +300,11 @@ export function createKeybindingsHandler(
  */
 export function tinykeys(
 	target: Window | HTMLElement,
-	keyBindingMap: KeyBindingMap,
-	options: KeyBindingOptions = {},
+	keybindingMap: KeybindingMap,
+	options: KeybindingOptions = {},
 ): () => void {
 	let event = options.event ?? DEFAULT_EVENT;
-	let onKeyEvent = createKeybindingsHandler(keyBindingMap, options)
+	let onKeyEvent = createKeybindingsHandler(keybindingMap, options)
 	target.addEventListener(event, onKeyEvent, options.capture)
 	return () => {
 		target.removeEventListener(event, onKeyEvent, options.capture)
