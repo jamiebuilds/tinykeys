@@ -1,13 +1,18 @@
 /**
- * A single press of a keybinding sequence
+ * A single press of a keybinding sequence.
  */
 export type KeybindingPress = [mods: string[], key: string | RegExp]
+
+/**
+ * Keyboard event callback fired when keybinding is triggered.
+ */
+export type KeybindingHandler = (event: KeyboardEvent) => void
 
 /**
  * A map of keybinding strings to event handlers.
  */
 export interface KeybindingsMap {
-	[keybinding: string]: (event: KeyboardEvent) => void
+	[keybinding: string]: KeybindingHandler
 }
 
 export type KeybindingFilter = (event: KeyboardEvent) => boolean
@@ -231,11 +236,11 @@ export function createKeybindingsHandler(
 	let timeout = options.timeout ?? DEFAULT_TIMEOUT
 	let ignore = options.ignore ?? defaultKeybindingsHandlerIgnore
 
-	let keybindings = Object.keys(keybindingsMap).map(key => {
-		return [parseKeybinding(key), keybindingsMap[key]] as const
+	let keybindings = Object.keys(keybindingsMap).map(input => {
+		return [input, parseKeybinding(input), keybindingsMap[input]] as const
 	})
 
-	let possibleMatches = new Map<KeybindingPress[], KeybindingPress[]>()
+	let pending = new Map<string, KeybindingPress[]>()
 	let timer: number | null = null
 
 	return event => {
@@ -243,12 +248,13 @@ export function createKeybindingsHandler(
 			return
 		}
 
-		for (const [sequence, callback] of keybindings) {
-			let prev = possibleMatches.get(sequence)
-			let remainingExpectedPresses = prev ? prev : sequence
-			let currentExpectedPress = remainingExpectedPresses[0]
+		let conflicts: Array<string> = []
+		for (let [input, sequence, handler] of keybindings) {
+			let prev = pending.get(input)
+			let expected = prev ? prev : sequence
+			let [current, ...rest] = expected
 
-			let matches = matchKeybindingPress(event, currentExpectedPress)
+			let matches = matchKeybindingPress(event, current)
 
 			if (!matches) {
 				// Modifier keydown events shouldn't break sequences
@@ -257,14 +263,22 @@ export function createKeybindingsHandler(
 				// - if the current keypress is a modifier then it will return true when we check its state
 				// MDN: https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/getModifierState
 				if (!getModifierState(event, event.key)) {
-					possibleMatches.delete(sequence)
+					pending.delete(input)
 				}
-			} else if (remainingExpectedPresses.length > 1) {
-				possibleMatches.set(sequence, remainingExpectedPresses.slice(1))
+			} else if (rest.length > 0) {
+				pending.set(input, rest)
+				conflicts.push(input)
 			} else {
-				possibleMatches.delete(sequence);
-				callback(event)
-				break;
+				pending.delete(input)
+				if (conflicts.length) {
+					console.warn(
+						`tinykeys: Conflict found, "${input}" did not fire, waiting for:`,
+						conflicts,
+					)
+				} else {
+					handler(event)
+					break
+				}
 			}
 		}
 
@@ -272,7 +286,7 @@ export function createKeybindingsHandler(
 			clearTimeout(timer)
 		}
 
-		timer = setTimeout(possibleMatches.clear.bind(possibleMatches), timeout)
+		timer = setTimeout(() => pending.clear(), timeout)
 	}
 }
 

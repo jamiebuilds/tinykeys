@@ -62,7 +62,7 @@ test.describe("tinykeys()", () => {
 			$tinykeys(window, { "y e e t": cb })
 			await userEvent.keyboard("yee")
 			expect(cb).not.toHaveBeenCalled()
-    })
+		})
 	})
 
 	test("keyup event", async () => {
@@ -155,52 +155,149 @@ test.describe("tinykeys()", () => {
 			await userEvent.type(input, "a")
 			expect(cb).toHaveBeenCalledOnce()
 		})
-  })
+	})
 
-  test.describe('multiple keybindings', () => {
-    test('first one wins', async () => {
-      let cb1 = vi.fn();
-      let cb2 = vi.fn();
+	test.describe("multiple keybindings", () => {
+		test("prefer keybindings declared earlier", async () => {
+			let cb1 = vi.fn()
+			let cb2 = vi.fn()
+			let warn = vi.spyOn(console, "warn").mockImplementation(() => {})
 
-      $tinykeys(window, {
-        "a": cb1,
-        "A": cb2,
-      });
+			$tinykeys(window, {
+				a: cb1,
+				A: cb2,
+			})
 
-      await userEvent.keyboard("{KeyA}")
+			await userEvent.keyboard("{KeyA}")
 
-      expect(cb1).toHaveBeenCalledOnce();
-      expect(cb2).not.toHaveBeenCalled();
-    });
+			expect(cb1).toHaveBeenCalledOnce()
+			expect(cb2).not.toHaveBeenCalled()
+			expect(warn).not.toHaveBeenCalled()
+		})
 
-    test('sequence completion vs single press', async () => {
-      let cb1 = vi.fn();
-      let cb2 = vi.fn();
+		test("prefer completion of sequence declared earlier over single press", async () => {
+			let cb1 = vi.fn()
+			let cb2 = vi.fn()
+			let warn = vi.spyOn(console, "warn").mockImplementation(() => {})
 
-      $tinykeys(window, {
-        "g a": cb1,
-        "a": cb2,
-      });
+			$tinykeys(window, {
+				"a b": cb1,
+				b: cb2,
+			})
 
-      await userEvent.keyboard("ga")
+			await userEvent.keyboard("ab")
 
-      expect(cb1).toHaveBeenCalledOnce();
-      expect(cb2).not.toHaveBeenCalled();
-    });
+			expect(cb1).toHaveBeenCalledOnce()
+			expect(cb2).not.toHaveBeenCalled()
+			expect(warn).not.toHaveBeenCalled()
+		})
 
-    test('sequence continuation vs single press', async () => {
-      let cb1 = vi.fn();
-      let cb2 = vi.fn();
+		test("prefer continuation of sequence declared earlier over single press", async () => {
+			let cb1 = vi.fn()
+			let cb2 = vi.fn()
+			let warn = vi.spyOn(console, "warn").mockImplementation(() => {})
 
-      $tinykeys(window, {
-        "g a b": cb1,
-        "a": cb2,
-      });
+			$tinykeys(window, {
+				"a b c": cb1,
+				a: cb2,
+			})
 
-      await userEvent.keyboard("gab")
+			await userEvent.keyboard("abc")
 
-      expect(cb1).toHaveBeenCalledOnce();
-      // expect(cb2).not.toHaveBeenCalled();
-    });
-  });
+			expect(cb1).toHaveBeenCalledOnce()
+			expect(cb2).not.toHaveBeenCalled()
+      expect(warn).toHaveBeenCalledExactlyOnceWith(
+        `tinykeys: Conflict found, "a" did not fire, waiting for:`,
+				["a b c"],
+      )
+		})
+
+		test("prefer single press declared earlier over start of sequence", async () => {
+			let cb1 = vi.fn()
+			let cb2 = vi.fn()
+			let warn = vi.spyOn(console, "warn").mockImplementation(() => {})
+
+			$tinykeys(window, {
+				a: cb1,
+				"a b c": cb2,
+			})
+
+			await userEvent.keyboard("abc")
+
+			expect(cb1).toHaveBeenCalledOnce()
+			expect(cb2).not.toHaveBeenCalled()
+			expect(warn).not.toHaveBeenCalled()
+		})
+
+		test("prefer single press declared earlier over continuation of sequence", async () => {
+			let cb1 = vi.fn()
+			let cb2 = vi.fn()
+			let warn = vi.spyOn(console, "warn").mockImplementation(() => {})
+
+			$tinykeys(window, {
+				b: cb1,
+				"a b c": cb2,
+			})
+
+			await userEvent.keyboard("abc")
+
+			expect(cb1).toHaveBeenCalledOnce()
+			expect(cb2).not.toHaveBeenCalled()
+			expect(warn).not.toHaveBeenCalled()
+		})
+
+		test("prefer completion of sequence declared earlier over continuation of sequence", async () => {
+			let cb1 = vi.fn()
+			let cb2 = vi.fn()
+			let warn = vi.spyOn(console, "warn").mockImplementation(() => {})
+
+			$tinykeys(window, {
+				"a b": cb1,
+				"a b c": cb2,
+			})
+
+			await userEvent.keyboard("abc")
+
+			expect(cb1).toHaveBeenCalledOnce()
+			expect(cb2).not.toHaveBeenCalled()
+			expect(warn).not.toHaveBeenCalled()
+		})
+
+		test("prefer continuation of sequence declared earlier over completion of sequence (with conflict warning)", async () => {
+			let cb1 = vi.fn()
+			let cb2 = vi.fn()
+			let warn = vi.spyOn(console, "warn").mockImplementation(() => {})
+
+			$tinykeys(window, {
+				"a b c": cb1,
+				"a b": cb2,
+			})
+
+			await userEvent.keyboard("ab")
+
+			expect(cb1).not.toHaveBeenCalledOnce()
+			expect(cb2).not.toHaveBeenCalled()
+			expect(warn).toHaveBeenCalledExactlyOnceWith(
+				`tinykeys: Conflict found, "a b" did not fire, waiting for:`,
+				["a b c"],
+			)
+		})
+
+		test("continue tracking sequences declared later in case earlier get broken", async () => {
+			let cb1 = vi.fn()
+			let cb2 = vi.fn()
+			let warn = vi.spyOn(console, "warn").mockImplementation(() => {})
+
+			$tinykeys(window, {
+				"a b c": cb1,
+				"b d": cb2,
+			})
+
+			await userEvent.keyboard("abd")
+
+			expect(cb1).not.toHaveBeenCalledOnce()
+			expect(cb2).toHaveBeenCalled()
+			expect(warn).not.toHaveBeenCalled()
+		})
+	})
 })
