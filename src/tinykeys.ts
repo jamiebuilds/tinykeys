@@ -113,8 +113,7 @@ let MOD = APPLE_DEVICE ? "Meta" : "Control"
  * - Android: Not supported
  * @see https://github.com/jamiebuilds/tinykeys/issues/185
  */
-let ALT_GRAPH_ALIASES =
-	PLATFORM === "Win32" ? ["Control", "Alt"] : APPLE_DEVICE ? ["Alt"] : []
+let ALT_GRAPH_ALIASES = PLATFORM === "Win32" ? ["Control", "Alt"] : ["Alt"]
 
 /**
  * Ensure and stop any event that isn't a full keyboard event.
@@ -139,9 +138,9 @@ export function defaultKeybindingsHandlerIgnore(event: KeyboardEvent) {
 		// Always ignore keyboard events during composition input
 		event.isComposing ||
 		// Always allow the current target
-		target !== event.currentTarget &&
-		// Ignore contenteditable and form elements
-		target.matches("[contenteditable],input,select,textarea")
+		(target !== event.currentTarget &&
+			// Ignore contenteditable and form elements
+			target.matches("[contenteditable],input,select,textarea"))
 	)
 }
 
@@ -205,6 +204,7 @@ export function matchKeybindingPress(
 	event: KeyboardEvent,
 	[requiredModifiers, optionalModifiers, key]: KeybindingPress,
 ): boolean {
+	const hasAltGraph = requiredModifiers.includes("AltGraph")
 	// prettier-ignore
 	return !(
 		// Allow either the `event.key` or the `event.code`
@@ -229,7 +229,10 @@ export function matchKeybindingPress(
 				!requiredModifiers.includes(mod) &&
 				!optionalModifiers.includes(mod) &&
 				key !== mod &&
-				getModifierState(event, mod)
+				getModifierState(event, mod) &&
+				// When AltGraph is required, its alias modifiers (e.g. Alt, Control)
+				// being active is expected — don't treat them as unexpected modifiers.
+				!(hasAltGraph && ALT_GRAPH_ALIASES.includes(mod))
 			);
 		})
 	)

@@ -25,6 +25,14 @@ function $tinykeys(
 	onTestFinished(unsubscribe)
 }
 
+function keyboardEvent(type: string, init?: KeyboardEventInit) {
+	window.dispatchEvent(new KeyboardEvent(type, { bubbles: true, ...init }))
+}
+
+function compositionEvent(type: string, init?: CompositionEventInit) {
+	window.dispatchEvent(new CompositionEvent(type, init))
+}
+
 test.describe("tinykeys()", () => {
 	test.describe("single press", () => {
 		test("KeyboardEvent.key", async () => {
@@ -171,15 +179,52 @@ test.describe("tinykeys()", () => {
 		})
 	})
 
+	test.describe("AltGraph modifier", () => {
+		test("fires AltGraph+key when AltGraph and Alt are active", () => {
+			let cb = vi.fn()
+			$tinykeys(window, { "AltGraph+KeyE": cb })
+			keyboardEvent("keydown", {
+				key: "€",
+				code: "KeyE",
+				modifierAltGraph: true,
+				altKey: true,
+			})
+			expect(cb).toHaveBeenCalledOnce()
+		})
+
+		test("fires Alt+key when only AltGraph is active (alias)", () => {
+			let cb = vi.fn()
+			$tinykeys(window, { "Alt+KeyE": cb })
+			keyboardEvent("keydown", {
+				key: "€",
+				code: "KeyE",
+				modifierAltGraph: true,
+				// altKey intentionally not set — AltGraph aliases to Alt
+			})
+			expect(cb).toHaveBeenCalledOnce()
+		})
+
+		test("does not fire AltGraph+key without AltGraph", () => {
+			let cb = vi.fn()
+			$tinykeys(window, { "AltGraph+KeyE": cb })
+			keyboardEvent("keydown", { key: "e", code: "KeyE" })
+			expect(cb).not.toHaveBeenCalled()
+		})
+
+		test("does not fire regular bindings when AltGraph is active", () => {
+			let cb = vi.fn()
+			$tinykeys(window, { KeyE: cb })
+			keyboardEvent("keydown", {
+				key: "€",
+				code: "KeyE",
+				modifierAltGraph: true,
+				altKey: true,
+			})
+			expect(cb).not.toHaveBeenCalled()
+		})
+	})
+
 	test.describe("IME composition", () => {
-		function keyboardEvent(type: string, init?: KeyboardEventInit) {
-			window.dispatchEvent(new KeyboardEvent(type, init))
-		}
-
-		function compositionEvent(type: string, init?: CompositionEventInit) {
-			window.dispatchEvent(new CompositionEvent(type, init));
-		}
-
 		test("ignores keydown events during IME composition", () => {
 			let cb = vi.fn()
 
@@ -196,8 +241,8 @@ test.describe("tinykeys()", () => {
 				["h", "KeyH"],
 				["a", "KeyA"],
 				["o", "KeyO"],
-				["Enter", "Enter"]
-			];
+				["Enter", "Enter"],
+			]
 
 			compositionEvent("compositionstart")
 			for (let [key, code] of composition) {
@@ -213,7 +258,11 @@ test.describe("tinykeys()", () => {
 
 			compositionEvent("compositionstart")
 			keyboardEvent("keydown", { key: "n", code: "KeyN", isComposing: true })
-			keyboardEvent("keydown", { key: "Enter", code: "Enter", isComposing: true })
+			keyboardEvent("keydown", {
+				key: "Enter",
+				code: "Enter",
+				isComposing: true,
+			})
 			compositionEvent("compositionend", { data: "你" })
 			expect(cb).not.toHaveBeenCalledOnce()
 
