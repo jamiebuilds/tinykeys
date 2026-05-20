@@ -1,6 +1,6 @@
 # `tinykeys`
 
-> A tiny (~650 B) & modern library for keybindings.
+> A tiny (~1KB) & modern library for keybindings.
 > [See Demo](https://jamiebuilds.github.io/tinykeys/)
 
 ## Install
@@ -162,6 +162,13 @@ valid value to
 "Meta+Shift+D"
 ```
 
+Modifiers can be made optional by wrapping them with `[brackets]`
+
+```js
+"[Shift]+?"
+"Control+[Shift]+D"
+```
+
 There is also a special `$mod` modifier that makes it easy to support cross
 platform keybindings:
 
@@ -173,8 +180,8 @@ platform keybindings:
 "$mod+Shift+D" // Meta/Control+Shift+D
 ```
 
-Alternatively, you can use parenthesis to use case-sensitive regular expressions
-to match multiple keys.
+You can also use parenthesis to use case-insensitive regular expressions to
+match multiple keys (Note: This does not work for modifiers).
 
 ```js
 "$mod+([0-9])" // $mod+0, $mod+1, $mod+2, etc...
@@ -255,8 +262,8 @@ earlier that might still match.
 
 ```js
 tinykeys(window, {
-  "a b c": () => console.log('abc'),
-  "a b": () => console.log('ab'),
+  "a b c": () => console.log("abc"),
+  "a b": () => console.log("ab"),
 })
 ```
 

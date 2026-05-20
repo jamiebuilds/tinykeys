@@ -1,7 +1,11 @@
 /**
  * A single press of a keybinding sequence.
  */
-export type KeybindingPress = [mods: string[], key: string | RegExp]
+export type KeybindingPress = readonly [
+	requiredModifiers: ReadonlyArray<string>,
+	optionalModifiers: ReadonlyArray<string>,
+	key: string | RegExp,
+]
 
 /**
  * Keyboard event callback fired when keybinding is triggered.
@@ -11,10 +15,11 @@ export type KeybindingHandler = (event: KeyboardEvent) => void
 /**
  * A map of keybinding strings to event handlers.
  */
-export interface KeybindingsMap {
-	[keybinding: string]: KeybindingHandler
-}
+export type KeybindingsMap = Record<string, KeybindingHandler>
 
+/**
+ * Predicate that returns true if a keyboard event should be ignored.
+ */
 export type KeybindingFilter = (event: KeyboardEvent) => boolean
 
 export interface KeybindingHandlerOptions {
@@ -155,6 +160,7 @@ function getModifierState(event: KeyboardEvent, mod: string) {
  * <sequence> = `<press> <press> <press> ...`
  * <press>    = `<key>` or `<mods>+<key>`
  * <mods>     = `<mod>+<mod>+...`
+ * <mod>      = `<modifier>` (required) or `[<modifier>]` (optional)
  * <key>      = `<KeyboardEvent.key>` or `<KeyboardEvent.code>` (case-insensitive)
  * <key>      = `(<regex>)` -> `/^(?:<regex>)$/iy` (case-insensitive)
  * ```
@@ -164,14 +170,27 @@ export function parseKeybinding(str: string): KeybindingPress[] {
 		.trim()
 		.split(" ")
 		.map(press => {
-			let mods = press.split(/\b\+/)
-			let key: string | RegExp = mods.pop() as string
-			let match = key.match(/^\((.+)\)$/)
-			if (match) {
-				key = new RegExp(`^(?:${match[1]})$`, "iv")
+			let parts = press.split(/(?<=\w|\])\+/)
+
+			let last: string | RegExp = parts.pop() as string
+			let regex = last.match(/^\((.+)\)$/)
+			let key = regex ? new RegExp(`^(?:${regex[1]})$`, "iv") : last
+
+			let requiredModifiers: string[] = []
+			let optionalModifiers: string[] = []
+
+			for (const part of parts) {
+				let optional = part.match(/^\[(.*)\]$/)
+				let mod = optional?.[1] ?? part
+				mod = mod === "$mod" ? MOD : mod
+				if (optional) {
+					optionalModifiers.push(mod)
+				} else {
+					requiredModifiers.push(mod)
+				}
 			}
-			mods = mods.map(mod => (mod === "$mod" ? MOD : mod))
-			return [mods, key]
+
+			return [requiredModifiers, optionalModifiers, key]
 		})
 }
 
@@ -180,7 +199,7 @@ export function parseKeybinding(str: string): KeybindingPress[] {
  */
 export function matchKeybindingPress(
 	event: KeyboardEvent,
-	[mods, key]: KeybindingPress,
+	[requiredModifiers, optionalModifiers, key]: KeybindingPress,
 ): boolean {
 	// prettier-ignore
 	return !(
@@ -193,8 +212,8 @@ export function matchKeybindingPress(
 			key !== event.code)
 		) ||
 
-		// Ensure all the modifiers in the keybinding are pressed.
-		mods.find(mod => {
+		// Ensure all required modifiers in the keybinding are pressed.
+		requiredModifiers.find(mod => {
 			return !getModifierState(event, mod)
 		}) ||
 
@@ -202,7 +221,12 @@ export function matchKeybindingPress(
 		// keybinding. So if they are pressed but aren't part of the current
 		// keybinding press, then we don't have a match.
 		KEYBINDING_MODIFIER_KEYS.find(mod => {
-			return !mods.includes(mod) && key !== mod && getModifierState(event, mod)
+			return (
+				!requiredModifiers.includes(mod) &&
+				!optionalModifiers.includes(mod) &&
+				key !== mod &&
+				getModifierState(event, mod)
+			);
 		})
 	)
 }

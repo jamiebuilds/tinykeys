@@ -124,6 +124,53 @@ test.describe("tinykeys()", () => {
 		})
 	})
 
+	test.describe("optional modifiers", () => {
+		test("fires without optional modifier", async () => {
+			let cb = vi.fn()
+			$tinykeys(window, { "[Shift]+a": cb })
+			await userEvent.keyboard("a")
+			expect(cb).toHaveBeenCalledOnce()
+		})
+
+		test("fires with optional modifier", async () => {
+			let cb = vi.fn()
+			$tinykeys(window, { "[Shift]+a": cb })
+			await userEvent.keyboard("{Shift>}{a}{/Shift}")
+			expect(cb).toHaveBeenCalledOnce()
+		})
+
+		test("fires without optional $mod modifier", async () => {
+			let cb = vi.fn()
+			$tinykeys(window, { "[$mod]+a": cb })
+			await userEvent.keyboard("a")
+			expect(cb).toHaveBeenCalledOnce()
+		})
+
+		test("fires with optional $mod modifier", async () => {
+			let cb = vi.fn()
+			$tinykeys(window, { "[$mod]+a": cb })
+			let mod = /Mac|iPod|iPhone|iPad/.test(navigator.platform)
+				? "Meta"
+				: "Control"
+			await userEvent.keyboard(`{${mod}>}{a}{/${mod}}`)
+			expect(cb).toHaveBeenCalledOnce()
+		})
+
+		test("required modifier still required alongside optional", async () => {
+			let cb = vi.fn()
+			$tinykeys(window, { "Control+[Shift]+a": cb })
+			await userEvent.keyboard("{Control>}{a}{/Control}")
+			expect(cb).toHaveBeenCalledOnce()
+		})
+
+		test("required modifier alongside optional modifier both pressed", async () => {
+			let cb = vi.fn()
+			$tinykeys(window, { "Control+[Shift]+a": cb })
+			await userEvent.keyboard("{Control>}{Shift>}{a}{/Shift}{/Control}")
+			expect(cb).toHaveBeenCalledOnce()
+		})
+	})
+
 	test.describe("options.ignore", () => {
 		test.describe("default", () => {
 			async function check(element: HTMLElement) {
@@ -206,10 +253,10 @@ test.describe("tinykeys()", () => {
 
 			expect(cb1).toHaveBeenCalledOnce()
 			expect(cb2).not.toHaveBeenCalled()
-      expect(warn).toHaveBeenCalledExactlyOnceWith(
-        `tinykeys: Conflict found, "a" did not fire, waiting for:`,
+			expect(warn).toHaveBeenCalledExactlyOnceWith(
+				`tinykeys: Conflict found, "a" did not fire, waiting for:`,
 				["a b c"],
-      )
+			)
 		})
 
 		test("prefer single press declared earlier over start of sequence", async () => {
