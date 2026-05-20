@@ -62,14 +62,20 @@ import { useEffect } from "react"
 import { tinykeys } from "tinykeys"
 
 function useKeyboardShortcuts() {
-  useEffect(() => {
-    let unsubscribe = tinykeys(window, {
-      // ...
-    })
-    return () => {
-      unsubscribe()
-    }
+  const formatBold = useEffectEvent(() => {
+    // ...
   })
+
+  const formatItalic = useEffectEvent(() => {
+    // ...
+  })
+
+  useEffect(() => {
+    return tinykeys(window, {
+      "$mod+b": formatBold,
+      "$mod+i": formatItalic,
+    })
+  }, [])
 }
 ```
 
