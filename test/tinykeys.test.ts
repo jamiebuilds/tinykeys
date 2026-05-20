@@ -171,6 +171,57 @@ test.describe("tinykeys()", () => {
 		})
 	})
 
+	test.describe("IME composition", () => {
+		function keyboardEvent(type: string, init?: KeyboardEventInit) {
+			window.dispatchEvent(new KeyboardEvent(type, init))
+		}
+
+		function compositionEvent(type: string, init?: CompositionEventInit) {
+			window.dispatchEvent(new CompositionEvent(type, init));
+		}
+
+		test("ignores keydown events during IME composition", () => {
+			let cb = vi.fn()
+
+			// "n" and "a" are pinyin letters used to type 你好 (nǐ hǎo)
+			$tinykeys(window, {
+				n: cb,
+				a: cb,
+				Enter: cb,
+			})
+
+			const composition = [
+				["n", "KeyN"],
+				["i", "KeyI"],
+				["h", "KeyH"],
+				["a", "KeyA"],
+				["o", "KeyO"],
+				["Enter", "Enter"]
+			];
+
+			compositionEvent("compositionstart")
+			for (let [key, code] of composition) {
+				keyboardEvent("keydown", { key, code, isComposing: true })
+			}
+			compositionEvent("compositionend", { data: "你好" })
+			expect(cb).not.toHaveBeenCalled()
+		})
+
+		test("allows keydown events after IME composition ends", () => {
+			let cb = vi.fn()
+			$tinykeys(window, { n: cb })
+
+			compositionEvent("compositionstart")
+			keyboardEvent("keydown", { key: "n", code: "KeyN", isComposing: true })
+			keyboardEvent("keydown", { key: "Enter", code: "Enter", isComposing: true })
+			compositionEvent("compositionend", { data: "你" })
+			expect(cb).not.toHaveBeenCalledOnce()
+
+			keyboardEvent("keydown", { key: "n", code: "KeyN", isComposing: false })
+			expect(cb).toHaveBeenCalledOnce()
+		})
+	})
+
 	test.describe("options.ignore", () => {
 		test.describe("default", () => {
 			async function check(element: HTMLElement) {

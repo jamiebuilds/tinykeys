@@ -134,6 +134,10 @@ function isKeyboardEvent(
 export function defaultKeybindingsHandlerIgnore(event: KeyboardEvent) {
 	let target = event.target as HTMLElement
 	return (
+		// Always ignore repeated keyboard events
+		event.repeat ||
+		// Always ignore keyboard events during composition input
+		event.isComposing ||
 		// Always allow the current target
 		target !== event.currentTarget &&
 		// Ignore contenteditable and form elements
