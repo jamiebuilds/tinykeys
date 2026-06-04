@@ -155,6 +155,27 @@ function getModifierState(event: KeyboardEvent, mod: string) {
 		: false
 }
 
+function splitKeybindingPress(press: string): string[] {
+	try {
+		return press.split(new RegExp("(?<=\\w|\\])\\+"))
+	} catch {
+		return splitKeybindingPressFallback(press)
+	}
+}
+
+function splitKeybindingPressFallback(press: string): string[] {
+	let parts: string[] = []
+	let start = 0
+	for (let index = 0; index < press.length; index++) {
+		if (press[index] === "+" && /[\w\]]/.test(press[index - 1] ?? "")) {
+			parts.push(press.slice(start, index))
+			start = index + 1
+		}
+	}
+	parts.push(press.slice(start))
+	return parts
+}
+
 /**
  * Parses a keybinding string into its parts.
  *
@@ -165,7 +186,7 @@ function getModifierState(event: KeyboardEvent, mod: string) {
  * <mods>     = `<mod>+<mod>+...`
  * <mod>      = `<modifier>` (required) or `[<modifier>]` (optional)
  * <key>      = `<KeyboardEvent.key>` or `<KeyboardEvent.code>` (case-insensitive)
- * <key>      = `(<regex>)` -> `/^(?:<regex>)$/iy` (case-insensitive)
+ * <key>      = `(<regex>)` -> `/^(?:<regex>)$/iv` (case-insensitive)
  * ```
  */
 export function parseKeybinding(str: string): KeybindingPress[] {
@@ -173,7 +194,7 @@ export function parseKeybinding(str: string): KeybindingPress[] {
 		.trim()
 		.split(" ")
 		.map(press => {
-			let parts = press.split(/(?<=\w|\])\+/)
+			let parts = splitKeybindingPress(press)
 
 			let last: string | RegExp = parts.pop() as string
 			let regex = last.match(/^\((.+)\)$/)
