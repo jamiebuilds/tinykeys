@@ -1,6 +1,7 @@
 import { expect, test, vi, onTestFinished } from "vitest"
 import { userEvent } from "vitest/browser"
 import {
+	parseKeybinding,
 	tinykeys,
 	type KeybindingsMap,
 	type KeybindingOptions,
@@ -34,6 +35,36 @@ function compositionEvent(type: string, init?: CompositionEventInit) {
 }
 
 test.describe("tinykeys()", () => {
+	test.describe("parseKeybinding()", () => {
+		test("splits optional modifiers with regex lookbehind", () => {
+			expect(parseKeybinding("Control+[Shift]+a")).toEqual([
+				[["Control"], ["Shift"], "a"],
+			])
+		})
+
+		test("falls back when regex lookbehind is unsupported", () => {
+			let NativeRegExp = RegExp
+
+			class IosRegExp extends NativeRegExp {
+				constructor(pattern: string, flags?: string) {
+					if (pattern.includes("(?<=")) {
+						throw new SyntaxError("Invalid regular expression")
+					}
+					super(pattern, flags)
+				}
+			}
+
+			vi.stubGlobal("RegExp", IosRegExp)
+			onTestFinished(() => {
+				vi.unstubAllGlobals()
+			})
+
+			expect(parseKeybinding("Control+[Shift]+a")).toEqual([
+				[["Control"], ["Shift"], "a"],
+			])
+		})
+	})
+
 	test.describe("single press", () => {
 		test("KeyboardEvent.key", async () => {
 			let cb = vi.fn()
