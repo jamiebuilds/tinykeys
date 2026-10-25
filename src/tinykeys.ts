@@ -312,6 +312,9 @@ export function createKeybindingsHandler(
 						conflicts,
 					)
 				} else {
+					if (!getModifierState(event, event.key)) {
+						pending.clear()
+					}
 					handler(event)
 					break
 				}

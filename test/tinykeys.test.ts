@@ -305,6 +305,36 @@ test.describe("tinykeys()", () => {
 	})
 
 	test.describe("multiple keybindings", () => {
+		test.each([true, false])(
+			"a single press interrupts a pending sequence (declared first: %s)",
+			async singleFirst => {
+				let single = vi.fn()
+				let sequence = vi.fn()
+				$tinykeys(
+					window,
+					singleFirst
+						? { x: single, "g i": sequence }
+						: { "g i": sequence, x: single },
+				)
+
+				await userEvent.keyboard("gxi")
+
+				expect(single).toHaveBeenCalledOnce()
+				expect(sequence).not.toHaveBeenCalled()
+			},
+		)
+
+		test("a bound modifier press preserves a pending sequence", async () => {
+			let modifier = vi.fn()
+			let sequence = vi.fn()
+			$tinykeys(window, { Shift: modifier, "g i": sequence })
+
+			await userEvent.keyboard("g{Shift}{/Shift}i")
+
+			expect(modifier).toHaveBeenCalledOnce()
+			expect(sequence).toHaveBeenCalledOnce()
+		})
+
 		test("prefer keybindings declared earlier", async () => {
 			let cb1 = vi.fn()
 			let cb2 = vi.fn()
